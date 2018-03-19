@@ -4,4 +4,5 @@ This R package provides functions for setting up and fitting negative binomial m
 
 
 Author: Nengjun Yi nyi@uab.edu
+
 Maintainer: Nengjun Yi nyi@uab.edu
