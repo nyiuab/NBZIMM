@@ -1,2 +1,1 @@
-# NBZIMM
-Negative Binomial and Zero-Inflated Mixed Models
+# NBZIMM: Negative Binomial and Zero-Inflated Mixed Models
