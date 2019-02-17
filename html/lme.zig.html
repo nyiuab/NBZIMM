@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Zero-Inflated Gaussian Mixed Models</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for lme.zig {NBZIMM}"><tr><td>lme.zig {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Zero-Inflated Gaussian Mixed Models
+</h2>
+
+<h3>Description</h3>
+
+<p>This function sets up and fits zero-inflated gaussian mixed models for analyzing zero-inflated continuous responses with multilevel data structures (for example, clustered data and longitudinal studies).    
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>  
+lme.zig(fixed, random, data, correlation, zi.random = FALSE,
+        niter = 30, epsilon = 1e-05, verbose = TRUE, ...)  
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>fixed</code></td>
+<td>
+ 
+<p>symbolic description of the fixed-effects part of the model, see details.
+</p>
+</td></tr>
+<tr valign="top"><td><code>random, data, correlation</code></td>
+<td>
+ 
+<p>These arguments are the same as in the function <code><a href="../../nlme/html/lme.html">lme</a></code> in the package <b>nlme</b>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>zi.random</code></td>
+<td>
+
+<p>logical. If <code>TRUE</code>, include the random effect specified by <code>random</code> in the zero-inflation part. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>niter</code></td>
+<td>
+
+<p>maximum number of iterations. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>epsilon</code></td>
+<td>
+
+<p>positive convergence tolerance.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>logical. If <code>TRUE</code>, print out number of iterations and computational time.
+</p>
+</td></tr>
+<tr valign="top"><td><code>...</code></td>
+<td>
+
+<p>further arguments for <code><a href="../../nlme/html/lme.html">lme</a></code>.  
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>Zero-inflated gaussian models are two-component mixture models combining a point mass at zero with Gaussian (normal) for continuous outcome. Thus, there are two sources of zeros: zeros may come from either the point mass at zero or the normal distribution. For modeling the unobserved state, a logistic model (logistic mixed model if <code>zi.random = TRUE</code>) is used.
+</p>
+<p>The argument <code>fixed</code> is to specify the fixed-effects part in both components of the model: <code>fixed = y ~ x | z</code> giving the fixed-effects part of the distribution model y ~ x conditional on (|) the zero-inflation model ~ z. A different (or same) set of fixed-effects covariates could be used for the distribution component and zero-inflation component. If <code>fixed = y ~ x</code>, then the same covariates are employed in both components, equivalent to y ~ x | x. The simplest zero-inflation model only includes an intercept: y ~ x | 1, and thus all zeros have the same probability of belonging to the zero component. Offsets can be specified in both components of the model : y ~ x + offset(x1) | z + offset(z1).
+</p>
+<p>The function is an alteration of the function <code><a href="../../MASS/html/glmmPQL.html">glmmPQL</a></code> in the package <b>MASS</b>, which fits generalized linear mixed models using Penalized Quasi-Likelihood and works by repeated calls to the function <code><a href="../../nlme/html/lme.html">lme</a></code> in the package <b>nlme</b>. It incorporates EM algorithms into the procedure of <code><a href="../../MASS/html/glmmPQL.html">glmmPQL</a></code> to fit zero-inflated mixed models for analyzing zero-inflated continuous responses in mutilevel study designs, for example, clustered and longitudinal studies. The function allows for multiple and correlated group-specific (random) effects (the argument <code>random</code>) and various types of within-group correlation structures (the argument <code>correlation</code>) described by <code><a href="../../nlme/html/corClasses.html">corStruct</a></code> in the package <b>nlme</b>. 
+</p>
+<p>Missing data may not be properly handled in some situations and thus should be removed before the analysis. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A fitted model object of class <code>lme</code> inheriting from <code><a href="../../nlme/html/lme.html">lme</a></code>, which can be summarized by functions in the package <b>nlme</b> for the distribution part.
+</p>
+<p>The object contains additional components for the zero-inflation part: 
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>zero.prob</code></td>
+<td>
+<p>the zero-state probabilities;</p>
+</td></tr>
+<tr valign="top"><td><code>zero.indicator</code></td>
+<td>
+<p>the conditional expectations of the zero indicators;</p>
+</td></tr>
+<tr valign="top"><td><code>xz</code></td>
+<td>
+<p>the design matrix of the zero-inflation part;</p>
+</td></tr>  
+<tr valign="top"><td><code>offsetz</code></td>
+<td>
+<p>the offset of the zero-inflation part;</p>
+</td></tr>
+<tr valign="top"><td><code>fit.zero</code></td>
+<td>
+<p>the fitted logistic (mixed) model for the zero-inflation part;</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Nengjun Yi, nyi@uab.edu
+</p>
+
+
+<h3>References</h3>
+
+<p>Pinheiro, J.C., and Bates, D.M. (2000) &quot;Mixed-Effects Models in S and S-PLUS&quot;, Springer. 
+</p>
+<p>Venables, W. N. and Ripley, B. D. (2002) &quot;Modern Applied Statistics with S&quot;. Fourth edition. Springer. 
+</p>
+<p>Xinyan Zhang, Himel Mallick, Xiangqin Cui, Andrew K. Benson, and Nengjun Yi (2017) Negative Binomial Mixed Models for Analyzing Microbiome Count Data. BMC Bioinformatics 18(1):4. 
+</p>
+<p>Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology.
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../nlme/html/lme.html">lme</a></code>, <code><a href="../../MASS/html/glmmPQL.html">glmmPQL</a></code>, <code><a href="glmm.zinb.html">glmm.zinb</a></code> 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(NBZIMM)
+
+data(Romero)
+names(Romero)
+
+otu = Romero$OTU; dim(otu)
+sam = Romero$SampleData; dim(sam)
+colnames(sam)
+
+N = sam[, "Total.Read.Counts"]  # total reads
+preg = sam$pregnant; table(preg)
+subject = sam[, "Subect_ID"]; table(subject)
+
+non = nonzero(y = otu, total = N, plot = F)
+nonzero.p = non[[1]]
+
+N = sam[, "Total.Read.Counts"]        
+Days = sam$GA_Days; Days = scale(Days)
+Age = sam$Age; Age = scale(Age)
+Race = sam$Race
+preg = sam$pregnant; table(preg)
+
+subject = sam[, "Subect_ID"]; table(subject)
+
+non = nonzero(y = otu, total = N, plot = F)
+nonzero.p = non[[1]]
+
+y = otu[, names(nonzero.p)[1]]
+
+y0 = log(y+1)
+f = lme.zig(y0 ~ Days + Age + Race + preg + offset(log(N)) | 1, random = ~ 1 | subject) 
+summary(f)
+fixed(f)
+summary(f$fit.zero)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

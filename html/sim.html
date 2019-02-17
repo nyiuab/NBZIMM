@@ -1,0 +1,138 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Simulating Overdispersed and/or Zero-Inflated Count Data with...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for sim {NBZIMM}"><tr><td>sim {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Simulating Overdispersed and/or Zero-Inflated Count Data with Random Effects
+</h2>
+
+<h3>Description</h3>
+
+<p>This function is to simulate overdispersed and/or zero-inflated count data with random effects.  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+sim(n.ind = 100, n.measure = 10, 
+    x.d, coef.d = 1, tau.d = 1.5, 
+    x.z, coef.z = 0, tau.z = 0, p.zero = 0, 
+    theta = 2)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>n.ind</code></td>
+<td>
+ 
+<p>number of individuals (or clusters). 
+</p>
+</td></tr>
+<tr valign="top"><td><code>n.measure</code></td>
+<td>
+ 
+<p>number of measures for each individual. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>x.d</code></td>
+<td>
+ 
+<p>design matrix of fixed-effects in the count part (distribution part). If not given, <code>x.d</code> will be generated as a binary predictor internally.
+</p>
+</td></tr>
+<tr valign="top"><td><code>coef.d</code></td>
+<td>
+ 
+<p>coefficients of <code>x.d</code>.   
+</p>
+</td></tr>
+<tr valign="top"><td><code>tau.d</code></td>
+<td>
+ 
+<p>standard deviation of random effect in the count part.   
+</p>
+</td></tr>
+<tr valign="top"><td><code>x.z</code></td>
+<td>
+ 
+<p>design matrix of fixed-effects in the zero-inflation part.
+</p>
+</td></tr>
+<tr valign="top"><td><code>coef.z</code></td>
+<td>
+ 
+<p>coefficients of <code>x.z</code>.   
+</p>
+</td></tr>
+<tr valign="top"><td><code>tau.z</code></td>
+<td>
+ 
+<p>standard deviation of random effect in the zero-inflation part.   
+</p>
+</td></tr>
+<tr valign="top"><td><code>p.zero</code></td>
+<td>
+ 
+<p>proportion of zeros from the the point mass at zero (i.e., not from the negative binomial count distribution). 
+</p>
+</td></tr>
+<tr valign="top"><td><code>theta</code></td>
+<td>
+ 
+<p>shape parameter for negative binomial model of the count part.   
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>a list containing individual ID <code>ind.ID</code>, design matrices <code>x.d</code> and <code>x.z</code>, Total number <code>T</code>, and count response <code>y</code>. 
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nengjun Yi, nyi@uab.edu
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(NBZIMM)
+
+d = sim(n.ind = 100, n.measure = 10, coef.d = 1, tau.d = 1.5, 
+        theta = 2, p.zero = 0)
+ind = d$ind.ID
+x = d$x.d
+y = d$y
+off = log(d$T)
+
+f1 = glmm.nb(y ~ offset(off) + x, random = ~ 1|ind) 
+summary(f1)
+f1$theta
+
+d = sim(n.ind = 100, n.measure = 10, coef.d = 1, tau.d = 1.5, 
+        theta = 2, p.zero = 0.4)
+ind = d$ind.ID
+x = d$x.d
+y = d$y
+off = log(d$T)
+
+f1 = glmm.zinb(y ~ offset(off) + x | 1, random = ~ 1|ind)
+summary(f1)
+f1$theta
+unique(f1$zero.prob)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

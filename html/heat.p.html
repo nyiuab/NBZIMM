@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: ggplot2 heatmap of p values</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for heat.p {NBZIMM}"><tr><td>heat.p {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+ggplot2 heatmap of p values  
+</h2>
+
+<h3>Description</h3>
+
+<p>Visualizing p values and positive coefficients for many responses and variables.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+heat.p(df, p.breaks = c(0.001, 0.01, 0.05), 
+      colors = c("darkblue", "blue", "lightblue", "grey"),
+      title = NULL, subtitle = NULL,
+      filter = c(FALSE, FALSE), x.size, y.size, symbol.size,
+      zigzag = c(FALSE, FALSE), abbrv = c(FALSE, FALSE), 
+      margin = c(1, 1), legend = TRUE) 
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>df</code></td>
+<td>
+
+<p>data frame, giving response names, variable names, coefficient estimates and p values for many responses and variables. The column names must include &quot;responses&quot;, &quot;variables&quot;, &quot;Estimate&quot; and &quot;pvalue&quot;. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>p.breaks</code></td>
+<td>
+
+<p>a vector (not including 0 and 1), partitioning p values into intervals. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>colors</code></td>
+<td>
+
+<p>different colors for different p value intervals.
+</p>
+</td></tr>
+<tr valign="top"><td><code>title</code></td>
+<td>
+
+<p>The text for title for the plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>subtitle</code></td>
+<td>
+
+<p>The text for subtitle below the title.
+</p>
+</td></tr>
+<tr valign="top"><td><code>filter</code></td>
+<td>
+
+<p>TRUE or FALSE. consist of two elements, the first is for responses (y-axis) and the second is for variables (x-axis). If <code>TRUE</code>, remove responses or variables with all p values larger than the maximun value of <code>p.breaks</code>.     
+</p>
+</td></tr>
+<tr valign="top"><td><code>x.size, y.size</code></td>
+<td>
+ 
+<p>size for names of x-axis or y-axis.
+</p>
+</td></tr>
+<tr valign="top"><td><code>symbol.size</code></td>
+<td>
+ 
+<p>size for the symbol &quot;+&quot; for positive estimates (only those with p values smaller than the maximun value of <code>p.breaks</code>).
+</p>
+</td></tr>
+<tr valign="top"><td><code>zigzag</code></td>
+<td>
+
+<p>TRUE or FALSE. consist of two elements, the first is for responses (y-axis) and the second is for variables (x-axis). If <code>TRUE</code>, re-arrange y-axis or x-axis labels in a zigzag shape.     
+</p>
+</td></tr>
+<tr valign="top"><td><code>abbrv</code></td>
+<td>
+
+<p>TRUE or FALSE. consist of two elements, the first is for responses (y-axis) and the second is for variables (x-axis). If <code>TRUE</code>, abbreviate y-axis or x-axis labels.     
+</p>
+</td></tr>
+<tr valign="top"><td><code>marigin</code></td>
+<td>
+
+<p>a numeric vector of two values for the margins in centimeter. the first is for the left and the second is for the bottom.      
+</p>
+</td></tr>
+<tr valign="top"><td><code>legend</code></td>
+<td>
+
+<p>TRUE or FALSE. show the legend for p values or not. 
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>ggplot2 object
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Boyi Guo, boyiguo1@uab.edu; Xinyan Zhang, abbyyan3@gmail.com; Nengjun Yi, nyi@uab.edu 
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+see examples in <code><a href="mms.html">mms</a></code> 
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

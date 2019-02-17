@@ -1,0 +1,80 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Proportions of Non-Zero Values</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for nonzero {NBZIMM}"><tr><td>nonzero {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Proportions of Non-Zero Values
+</h2>
+
+<h3>Description</h3>
+
+<p>This simple function calculates the proportion of non-zero values for each response and plots the proportions.  
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+nonzero(y, total, plot = FALSE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>y</code></td>
+<td>
+ 
+<p>a matrix of responses; each column is a response and rows are samples. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>total</code></td>
+<td>
+
+<p>optional. It is total number (total reads in microbiome data). If not provided, the number is calculated as the column sum of <code>y</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>plot</code></td>
+<td>
+
+<p>plot zero proportion and total number or not.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>ordered proportions of non-zero values for responses: <code>nonzero.p</code>, total numbers for all samples: <code>total</code>, mean and standard deviation of total numbers: <code>total_mean_sd</code>, and plots of ordered proportions of zero values and total numbers.
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nengjun Yi, nyi@uab.edu
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(NBZIMM)
+
+data(Romero)
+names(Romero)
+otu = Romero$OTU; dim(otu)
+sam = Romero$SampleData; dim(sam)
+colnames(sam)
+N = sam[, "Total.Read.Counts"]  # total reads
+
+non = nonzero(y = otu, total = N, plot = T)
+non
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

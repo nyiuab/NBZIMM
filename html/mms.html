@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Fitting Mixed Models Separately for Many Responses</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for mms {NBZIMM}"><tr><td>mms {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Fitting Mixed Models Separately for Many Responses 
+</h2>
+
+<h3>Description</h3>
+
+<p>This function fits mixed models separately for many responses.    
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>  
+mms(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
+    correlation, zi.random = FALSE, niter = 30, epsilon = 1e-05,   
+    min.p = 0, sort = FALSE, verbose = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>y</code></td>
+<td>
+
+<p>a matrix of responses; each column is a response and rows are samples. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>fixed</code></td>
+<td>
+ 
+<p>a one-sided formula of the form <code>~ x</code> (i.e., the respose is omitted); the right side of <code>~</code> is the same as in <code><a href="glmm.nb.html">glmm.nb</a></code>, <code><a href="../../nlme/html/lme.html">lme</a></code>, <code><a href="glmm.zinb.html">glmm.zinb</a></code>, or <code><a href="lme.zig.html">lme.zig</a></code>. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>data, random, correlation, zi.random, niter, epsilon, verbose</code></td>
+<td>
+ 
+<p>These arguments are the same as in <code><a href="glmm.nb.html">glmm.nb</a></code>, <code><a href="../../nlme/html/lme.html">lme</a></code>, <code><a href="glmm.zinb.html">glmm.zinb</a></code>, or <code><a href="lme.zig.html">lme.zig</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>method</code></td>
+<td>
+
+<p>character specification of the method:
+<code>"nb"</code>: glmm.nb; <code>"lme"</code>: lme;       
+<code>"zinb"</code>: glmm.zinb; <code>"zig"</code>: lme.zig. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>min.p</code></td>
+<td>
+
+<p>a value in [0, 1). The responses with the proportion of non-zero values &gt; min.p are analyzed.
+</p>
+</td></tr>
+<tr valign="top"><td><code>sort</code></td>
+<td>
+
+<p>sort by the nonzero proportions of the responses into decreasing order.
+</p>
+</td></tr>
+<tr valign="top"><td><code>verbose</code></td>
+<td>
+
+<p>logical. If <code>TRUE</code>, print out computational time.
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function analyzes the responses in <code>y</code> by repeated calls to <code><a href="glmm.nb.html">glmm.nb</a></code>, <code><a href="../../nlme/html/lme.html">lme</a></code>, <code><a href="glmm.zinb.html">glmm.zinb</a></code>, or <code><a href="lme.zig.html">lme.zig</a></code>. 
+</p>
+
+
+<h3>Value</h3>
+
+<p>A list including <code>fit</code>,  <code>responses</code>, <code>variables</code>, and <code>call</code>:
+</p>
+<table summary="R valueblock">
+<tr valign="top"><td><code>fit</code></td>
+<td>
+<p>fitted models for all the responses;</p>
+</td></tr>
+<tr valign="top"><td><code>responses</code></td>
+<td>
+<p>names of all the responses;</p>
+</td></tr>
+<tr valign="top"><td><code>variables</code></td>
+<td>
+<p>names of all covariates;</p>
+</td></tr>
+</table>
+
+
+<h3>Author(s)</h3>
+
+<p>Nengjun Yi, nyi@uab.edu
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../nlme/html/lme.html">lme</a></code>, <code><a href="glmm.nb.html">glmm.nb</a></code>, <code><a href="glmm.zinb.html">glmm.zinb</a></code>, <code><a href="lme.zig.html">lme.zig</a></code>  
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+
+library(NBZIMM)
+
+data(Romero)
+names(Romero)
+
+otu = Romero$OTU; dim(otu)
+sam = Romero$SampleData; dim(sam)
+colnames(sam)
+
+N = sam[, "Total.Read.Counts"]        
+Days = sam$GA_Days; Days = scale(Days)
+Age = sam$Age; Age = scale(Age)
+Race = sam$Race
+preg = sam$pregnant; table(preg)
+
+subject = sam[, "Subect_ID"]; table(subject)
+
+# analyze all taxa with a given nonzero proportion
+
+f = mms(y = otu, fixed = ~ Days + Age + Race + preg + offset(log(N)), 
+        random = ~ 1 | subject,
+        min.p = 0.2, method = "nb")
+        
+
+out = fixed(f)$dist
+out = out[out[,2]!="(Intercept)", ]
+res = out[, 3:5]
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 12, 4, 4))
+plot.fixed(res=res, threshold=0.001, gap=500, col.pts=c("black", "grey"),
+           cex.axis=0.6, cex.var=0.7)
+
+res = get.fixed(f, part="dist", vr.name="preg", sort.p=F)
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 10, 4, 4))
+plot.fixed(res, threshold=0.05, gap=300, main="Covariate: pregnant",
+           cex.axis=0.6, cex.var=0.7)
+
+
+out = fixed(f)$dist
+out = out[out[,2]!="(Intercept)", ]
+g = heat.p(df=out, p.breaks = c(0.001, 0.01, 0.05), 
+       colors = c("black", "darkgrey", "grey", "lightgrey"),
+       zigzag=c(T,F), abbrv=c(T,F), margin=c(2.5,0.5), y.size=8,
+       legend=T)
+
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>

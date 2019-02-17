@@ -1,0 +1,127 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><title>R: Plotting Estimates, Standard Deviations and P-values of Fixed...</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+
+<table width="100%" summary="page for plot.fixed {NBZIMM}"><tr><td>plot.fixed {NBZIMM}</td><td style="text-align: right;">R Documentation</td></tr></table>
+
+<h2>
+Plotting Estimates, Standard Deviations and P-values of Fixed Effects 
+</h2>
+
+<h3>Description</h3>
+
+<p>Plotting estimates, standard deviations and p-values of fixed effects.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+plot.fixed(res, threshold = 0.05, main = " ", col.pts = "black", gap = 0, 
+          show.all.vars = FALSE, show.pvalues = TRUE, 
+          cex.main = 0.9, xlim = NULL, cex.axis = 0.8, cex.var = 0.8, cex.pts = 1, 
+          pch.pts = 20, type = "p", lwd = 1, lty = 1, line = 0,  
+          add = FALSE) 
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>res</code></td>
+<td>
+
+<p>A matrix of the estimates, standard deviations and p-values of fixed effects for the response or variable. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>threshold</code></td>
+<td>
+
+<p>a p-value to determine variables to be shown: variables with p-value &lt; <code>threshold</code>. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>col.pts</code></td>
+<td>
+
+<p>color of points and segments, default is black. It can be a vector with two elements, which will use specified colors for different 
+variables determined by the augument <code>threshold</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>gap</code></td>
+<td>
+
+<p>a value for the distance between two flanking significant variables. 
+</p>
+</td></tr>
+<tr valign="top"><td><code>main, cex.main, xlim, type, lwd, lty, line</code></td>
+<td>
+ 
+<p>These arguments are the same as in <code><a href="../../graphics/html/plot.html">plot</a></code> and <code><a href="../../graphics/html/par.html">par</a></code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>show.all.vars</code></td>
+<td>
+
+<p>logical. If <code>TRUE</code>,show names of all variables. The default is <code>FALSE</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>show.pvalues</code></td>
+<td>
+
+<p>logical. If <code>TRUE</code>, show p-values for variables. The default is <code>TRUE</code>. The p-values are shown on the right side of the plot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cex.var</code></td>
+<td>
+
+<p>the fontsize of the varible names, default = <code>0.8</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>cex.pts</code></td>
+<td>
+
+<p>the size of points, default = <code>1</code>.
+</p>
+</td></tr>
+<tr valign="top"><td><code>pch.pts</code></td>
+<td>
+
+<p>symbol of points, default is solid dot.
+</p>
+</td></tr>
+<tr valign="top"><td><code>add</code></td>
+<td>
+
+<p>logical. if <code>TRUE</code>, plot over the existing plot. The default is <code>FALSE</code>. 
+</p>
+</td></tr>
+</table>
+
+
+<h3>Details</h3>
+
+<p>This function plots the estimates of coefficients, intervals and p-values for a response or variable. It uses different colors to distinguish between significant and insignificant variables based on a threshold.  
+</p>
+
+
+<h3>Author(s)</h3>
+
+<p>Nengjun Yi, nyi@uab.edu
+</p>
+
+
+<h3>See Also</h3>
+
+<p><code><a href="../../graphics/html/plot.html">plot</a></code>, <code><a href="../../graphics/html/par.html">par</a></code>
+</p>
+
+
+<h3>Examples</h3>
+
+<pre>
+see examples in <code><a href="mms.html">mms</a></code> 
+</pre>
+
+<hr /><div style="text-align: center;">[Package <em>NBZIMM</em> version 1.0 <a href="00Index.html">Index</a>]</div>
+</body></html>
