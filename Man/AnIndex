@@ -1,0 +1,14 @@
+NBZIMM-package	NBZIMM-package
+covariates	covariates
+fixed	fixed
+get.fixed	get.fixed
+glmm.nb	glmm.nb
+glmm.zinb	glmm.zinb
+heat.p	heat.p
+lme.zig	lme.zig
+mms	mms
+NBZIMM	NBZIMM-package
+nonzero	nonzero
+plot.fixed	plot.fixed
+Romero	Romero
+sim	sim
