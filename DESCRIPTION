@@ -7,4 +7,5 @@ Author: Nengjun Yi <nyi@uab.edu>
 Maintainer: Nengjun Yi <nyi@uab.edu>
 Description: Functions for setting up and fitting negative binomial mixed models, and zero-inflated negative binomial and Gaussian mixed models. These functions can be used to analyze general count data but also large-scale count data with multilevel structures.  
 License: MIT + file LICENSE
-Built: R 3.5.1; ; 2019-02-06 04:27:01 UTC; windows
+NeedsCompilation: no
+Packaged: 2019-02-06 04:27:21 UTC; Nyi
