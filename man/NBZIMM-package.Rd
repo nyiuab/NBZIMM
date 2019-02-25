@@ -18,7 +18,7 @@
   Type: \tab Package\cr
   Version: \tab 1.0\cr
   Date: \tab 2019-02-01\cr
-  License: \tab GPL\cr
+  License: \tab MIT\cr
   LazyLoad: \tab yes\cr
   }
 }
