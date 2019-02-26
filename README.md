@@ -10,17 +10,12 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
 
 Three ways to install the package in R:
 
-1. Without Vignettes
+1. Without Vignettes (must install package: devtools)
 ```{r}
-if (!requireNamespace("devtools")) install.packages("devtools")
-library(devtools)
-install_github("nyiuab/NBZIMM")
+devtools::install_github("nyiuab/NBZIMM")
 ```
-2. With Vignettes
+2. With Vignettes (must install packages: devtools, knitr, R.rsp)
 ```{r}
-if (!requireNamespace("devtools")) install.packages("devtools")
-if(!requireNamespace(R.rsp)) install.packages("R.rsp")
-library(devtools)
-install_github("nyiuab/NBZIMM", build_opts = c("--no-resave-data", "--no-manual"), force = T)
+devtools::install_github("nyiuab/NBZIMM", build_opts = c("--no-resave-data", "--no-manual"), force = T)
 ```
 3. Download the NBZIMM zip file to your computer, and then install it to R.
