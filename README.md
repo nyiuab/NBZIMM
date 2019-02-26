@@ -18,6 +18,8 @@ install_github("nyiuab/NBZIMM")
 2. With Vignettes
 ```{r}
 library(devtools)
+if(!require(R.rsp)) install.packages("R.rsp")
+library(R.rsp)
 install_github("nyiuab/NBZIMM", build_opts = c("--no-resave-data", "--no-manual"), force = T)
 ```
 3. Download the NBZIMM zip file to your computer, and then install it to R.
