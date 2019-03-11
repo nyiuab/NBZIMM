@@ -14,7 +14,7 @@ Two ways to install the package in R:
 ```{r}
 devtools::install_github("nyiuab/NBZIMM", build_opts = c("--no-resave-data", "--no-manual"), force = T)
 ```
-2. Without Vignettes (must install package: devtools, force = T)
+2. Without Vignettes (must install package: devtools)
 ```{r}
-devtools::install_github("nyiuab/NBZIMM")
+devtools::install_github("nyiuab/NBZIMM", force = T)
 ```
