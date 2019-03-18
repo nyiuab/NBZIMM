@@ -3,6 +3,7 @@ mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
                 correlation, zi.random = FALSE, niter = 30, epsilon = 1e-05,  
                 min.p = 0, sort = FALSE, verbose = TRUE)
 {
+  if (!requireNamespace("nlme")) install.packages("nlme")
   library(nlme)
   start.time <- Sys.time()
   

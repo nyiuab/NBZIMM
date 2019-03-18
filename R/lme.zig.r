@@ -4,8 +4,10 @@
 lme.zig <- function (fixed, random, data, correlation, zi.random = FALSE, 
                      niter = 30, epsilon = 1e-05, verbose = TRUE, ...)
 {
-    library(nlme)
-    library(MASS)
+  if (!requireNamespace("nlme")) install.packages("nlme")
+  if (!requireNamespace("MASS")) install.packages("MASS")
+  library(nlme)
+  library(MASS)
     
     start.time <- Sys.time()
     

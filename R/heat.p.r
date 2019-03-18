@@ -6,6 +6,8 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
                     zigzag = c(FALSE, FALSE), abbrv = c(FALSE, FALSE), 
                     margin = c(1, 1), legend = TRUE) 
 {
+  if (!requireNamespace("ggplot2")) install.packages("ggplot2")
+  if (!requireNamespace("grid")) install.packages("grid")
   require(ggplot2)
   require(grid)
   
