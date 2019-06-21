@@ -1,0 +1,249 @@
+---
+title: "Fitting Zero Inflated Gaussian Mixed Models for Analyzing Longitudinal Microbiome Data with NBZIMM"
+author: "Nengjun Yi, Xinyan Zhang"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{zigmms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+
+```{r, SETTINGS-knitr, include=FALSE}
+stopifnot(require(knitr))
+opts_chunk$set(
+  comment=NA, 
+  message = FALSE, 
+  warning = FALSE, 
+  eval = params$EVAL,
+  dev = "png",
+  dpi = 500,
+  fig.asp = 0.618,
+  fig.width = 14,
+  out.width = "100%",
+  fig.align = "center"
+)
+```
+```{r, pkgs, include=FALSE}
+library("NBZIMM")
+```
+
+## Introduction
+
+This vignette focuses on demonstrations of Zero-inflated Gaussian Mixed Models (ZIGMMs) in analyzing longitudinal microbiome proportion or count data with **NBZIMM**. 
+
+The **NBZIMM**  provides functions for setting up and fitting zero-inflated Gaussian mixed models. We have created the function `lme.zig` and `mms` for setting up and fitting the proposed ZIGMMs. The functions `lme.zig` and `mms` works by repeated calls to the function lme for fitting linear mixed models in the recommended package nlme in R. It is a robust and flexible method which can be applicable for transformed longitudinal microbiome count data or proportion data generated with either 16S rRNA or shotgun sequencing technologies. It can include various types of fixed effects and random effects and account for various within-subject correlation structures, and can effectively handle zero-inflation. We develop an efficient EM algorithm to fit the ZIGMMs by taking advantage of the standard procedure for fitting linear mixed models. 
+
+In this vignette we'll use the `lme.zig` function and `mms` function in the 
+**NBZIMM** package to demonstrate the analysis of a public available dataset from Vincent et al.$ (2016).
+
+## Model
+
+In a longitudinal studie, we collect multiple subjects and measure each subject at several time points (i.e., samples). Assume that there are $n$ subjects, and subject $i$ is measured at $n_i$ time points $t_{ij};\ j = 1,\dots,\ n_i;\ i = 1,\dots,\ n$. For the $j-th$ sample of the $i-th$ subject, we denote $c_{ijh}$ as the observed count for the $h-th$ taxon at certain taxonomic levels. And we transform the proportion data with $y_{ij} = arcsine(\sqrt{(c_{ijh}/T_{ij})}$ for any given taxon $h$. For count data, transforming it as $y_{ij} = log_2(c_{ijh}+1)$. In our ZIGMMs, $y_{ij}$ are assumed to follow the zero-inflated Gaussian distribution:
+
+$$y_{ij} \sim  \left\{
+\begin{array}
+{rr}
+0 \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ & with\ probability\ p_{ij} \\
+N(y_{ij}|\mu_{ij}, \sigma^2) & with\ probability\ 1-p_{ij} 
+\end{array}
+\right.$$
+
+
+where $\mu_{ij}$ and $sigma$ are the mean and standard deviation parameters in the normal distribution. $p_{ij}$ is the unknown probability that $y_{ij}$ is from the zero state. 
+
+The above model consists of two related components: a normal distribution for the values $y_{ij}$ and a zero-inflation model for the probabilities $p_{ij}$. For $y_{ij} = log_2(c_{ijh}+1)$, the means μij are expressed as: 
+ 
+ $$ \mu_{ij} = log(T_{ij})+X_{ij}\beta+G_{ij}b_i $$
+
+where $log(T_{ij})$ is the offset that corrects for the variation of the total sequence reads. For $y_{ij} = arcsine(\sqrt{(c_{ijh}/T_{ij})}$, the offset $log(T_{ij})$ should be excluded, because the total read is accounted for in the response. $X_{ij}=(1,X_i, t_{ij}, X_i^st_{ij})$, $X_i^s$ is the variable of interest in $X_i$, for example, an indicator variable for the case group and the control group, and $G_{ij}=(1, t_{ij})$; $\beta=(\beta_0, \beta_1, \beta_2, \beta_3)^T$ is the vector of fixed effects (i.e., population-level effects), including an intercept, the effects of the host variables $X_i$, the over-all time effect, and the interaction  $X_i^s$ and $t_{ij}$ ; $b_i = (b_{0i}, b_{1i})^T$ is the vector of random effects (i.e., subject-level effects), including the random intercept $b_{0i}$ and the random time effect $b_{1i}$. The vector of the random effects is usually assumed to follow a multivariate normal distribution (Pinheiro and Bates, 2000;McCulloch and Searle, 2001):   
+
+$$b_i \sim N(0, \Psi_b)$$
+where $\Psi$ is the variance-covariance matrix, which can be a general positive-definite matrix that accounts for the correlation of the random covariates. 
+
+The zero-inflation probabilities $p_{ij}$ are assumed to relate some covariates through the logit link function: 
+       
+$$ logit(p_{ij}) = Z_{ij}\alpha $$                                               
+where $Z_{ij}$ includes some covariates that are potentially associated with the zero state. The simplest zero-inflation model includes only the intercept in $Z_{ij}$, resulting in the same probability of belonging to the zero state for all zeros. We also can add the random-effect terms into the above model:
+$$ logit(p_{ij}) = Z_{ij}\alpha+G_{ij}a_i $$  
+
+where the random effects $a_i$ are assumed to follow a multivariate normal distribution: 
+$$a_i \sim N(0, \Psi_a)$$
+
+
+## The EM Algorithm for Fitting the ZIGMMs 
+
+We develop an efficient EM algorithm to fit the ZIGMMs by taking advantage of the standard procedure for fitting LMMs. We can relax the assumption of independent within-subject errors to account for special within-subject correlation structures:
+$$y_{ij}=X_{ij}\beta+G_{ij}b_i+(1-\hat{\xi_{ij}})^{-1/2}e_{ij},\ b_i \sim N(0, \Psi),\ e_i=(e_{i1},\ ...,\ e_{in_i})`\sim N(0, \sigma^2R_i) $$
+where $\xi_{ij}$ is the indicator variable for zero-inflated distribution, and $R_i$ is a correlation matrix, which describes dependence among observations. Pinheiro and Bates (2000) describes several ways to specify the correlation matrix $R_i$, all of which can be incorporated into our ZIGMMs.
+
+## Demonstration with Example
+
+This example used a published dataset from [Vincent et al.(2016)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4791782/). Vincent et al. (2016) used whole metagenome shotgun sequencing to examine the diversity and composition of the fecal microbiota from 98 hospitalized patients. The prospective cohort study was carried out among 8 patients who were either Clostridium difficile infected or colonized and other 90 patients. Clinical data included gender, age, and days from first collection of the fecal samples. The clinical data and shotgun sequencing microbiome abundance/relative abundance data were downloaded by R package curatedMetagenomicData (Pasolli et al., 2017). The metagenomics data could be transformed to count data but a more common output data type is proportion data. Here the example dataset is a proportion dataset.
+Here we import the dataset and check the clinical variables first.
+
+
+```{r, vincent}
+load("vincent2016.RData") 
+
+```
+
+
+```{r, variables}
+dim(clinical)
+colnames(clinical)
+
+group = ifelse(clinical$study_condition == "CDI", 1, 0) 
+
+N = clinical[, "number_reads"]  # total reads
+mean(N); sd(N)
+mean(log(N)); sd(log(N))
+
+subject = clinical[, "subjectID"]
+age = clinical[, "age"]
+gender = clinical[, "gender"]
+days = clinical[, "days_from_first_collection"]
+
+pheno = as.matrix(t(otu)) # transpose the microbiome data
+pheno = apply(pheno, 2, function(x) as.numeric(x)/100)
+dim(pheno)
+head(colnames(pheno))
+
+non = nonzero(y = pheno, total = N, plot = F)
+nonzero.p = non[[1]]
+```
+
+
+
+### Analysis of a single taxon each time
+
+We then show the analysis of a single taxon (Prevotella Bivia) with the function `lme.zig`.
+
+The group variable of interest is CDI vs healthy controls. We consider the sample collection time as the time variable and also include covariates, age, gender. Different models can be used to analyze this dataset. The first model could be a simple random intercept without interaction term. An offset term is not needed as we are analyzing proportion data.
+```{r, eval=FALSE}
+y = pheno[, names(nonzero.p)[1]] # Prevotella_bivia
+y = asin(sqrt(y))
+f = lme.zig(y ~ group + days  + age + gender|1, random = ~ 1 | subject)
+
+summary(f)
+```
+
+
+```{r glmmnb, include=FALSE}
+y = pheno[, names(nonzero.p)[1]] # Lactobacillus
+y = asin(sqrt(y))
+f = lme.zig(y ~ group + days  + age + gender|1, random = ~ 1 | subject)
+```
+
+We can summarize the results using `summary` function.
+
+```{r, print-fit, echo=FALSE}
+summary(f)
+```
+
+Now, we can add the interaction term.
+```{r, eval=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = ~ 1 | subject)
+
+summary(f)
+```
+
+```{r glmmnb2, include=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = ~ 1 | subject)
+```
+
+We can summarize the results using `summary` function.
+```{r, print-fit2, echo=FALSE}
+summary(f)
+```
+Or, we can add the random slope in the model.
+```{r, eval=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = list(subject = pdDiag(~days)))
+
+```
+
+```{r glmmnb3, include=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = list(subject = pdDiag(~days)))
+```
+
+We can also incorporate autoregressive of order 1, AR(1) for correlation matrix $R_i$ to describe dependence among observations.
+
+```{r, eval=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = ~ 1 | subject, correlation = corAR1())
+
+```
+
+```{r glmmnb4, include=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|1, random = ~ 1 | subject, correlation = corAR1())
+```
+
+None of the above models consider any covariate in the zero state. We can add some possible covariate in the zero state as well.
+
+```{r, eval=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|group, random = ~ 1 | subject)
+
+```
+
+```{r glmmnb5, include=FALSE}
+f = lme.zig(y ~ group*days  + age + gender|group, random = ~ 1 | subject)
+```
+
+### Analysis of all taxa with a given nonzero proportion
+On the contrary, if you have many taxa of interest, it is easier to analyze them all at one time with the function `mms`. The following example analyze all the taxa with the proportion of non-zero values $>$ min.p. Here, we only analyze the first 30 taxa.
+```{r, eval=FALSE}
+f = mms(y = pheno[, 1:30], fixed = ~ group*days  + age + gender|1, 
+random = ~ 1 | subject,
+min.p = 0.2, method = "zig")
+```
+
+```{r glmmnb6, include=FALSE}
+f = mms(y = pheno[, 1:30], fixed = ~ group*days  + age + gender|1, 
+random = ~ 1 | subject,
+min.p = 0.2, method = "zig")
+```
+
+### Visualize the results
+Then we can generate a plot to view the significant taxa and corresponding p-values.
+```{r, res1, fig.width=12, fig.height=8}
+out = fixed(f)$dist
+out = out[out[,2]!="(Intercept)", ]
+res = out[, 3:5]
+
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 14, 4, 4))
+plot.fixed(res=res, threshold=0.05, gap=500, col.pts=c("black", "grey"),
+cex.axis=1, cex.var=1)
+```
+
+```{r, res2, fig.width=12, fig.height=8}
+res = get.fixed(f, part="dist", vr.name="group", sort.p=F)
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 14, 4, 4))
+plot.fixed(res, threshold=0.05, gap=300, main="Covariate: group",
+cex.axis=1, cex.var=1)
+```
+
+A heat map could also be generated to present the results.
+```{r, eval=FALSE}
+out = fixed(f)$dist
+out = out[out[,2]!="(Intercept)", ]
+heat.p(df=out, zigzag=c(T,F), abbrv=c(T,F), margin=c(1.5,10), y.size=8)
+```
+
+```{r echo=FALSE, out.width='100%'}
+knitr::include_graphics('C:/Users/xzhang/Documents/Heatmap for zigmms vignette.jpeg')
+```
+
+## References
+
+Pinheiro, J.C., and Bates, D.M. (2000) "Mixed-Effects Models in S and S-PLUS", Springer.
+
+Venables, W. N. and Ripley, B. D. (2002) "Modern Applied Statistics with S". Fourth edition. Springer.
+
+Xinyan Zhang, Himel Mallick, Xiangqin Cui, Andrew K. Benson, and Nengjun Yi (2017) Negative Binomial Mixed Models for Analyzing Microbiome Count Data. BMC Bioinformatics 18(1):4.
+
+Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology.
+
+Vincent, C., Miller, M. A., Edens, T. J., Mehrotra, S., Dewar, K., & Manges, A. R. (2016). Bloom and bust: intestinal microbiota dynamics in response to hospital exposures and Clostridium difficile colonization or infection. Microbiome, 4, 12. doi:10.1186/s40168-016-0156-3
