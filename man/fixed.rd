@@ -13,7 +13,7 @@ from the output of \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zi
 }
 
 \usage{
-fixed(object) 
+fixed(object, adj.p=FALSE) 
 
 fixed.nb(object)
 
@@ -21,15 +21,17 @@ fixed.lme(object)
 
 fixed.zi(object)
 
-fixed.mms(object)
+fixed.mms(object, adj.p=FALSE)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{ 
-  an object from \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, \code{\link{lme.zig}}, or \code{\link{mms}}. 
-}
-  
+  an object from \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, \code{\link{lme.zig}}, or \code{\link{mms}}.
+  }
+  \item{adj.p}{
+  adjust p-values using FDR method. only for object from \code{\link{mms}}.
+  }
 }
 
 \details{
@@ -41,7 +43,7 @@ This function returns the following values for the distribution part (\code{dist
 
 \item{Estimate}{intercept and coefficient estimates;} 
 \item{Std. Error}{standard errors of estimates;}
-\item{pvalue}{p values for testing coefficients;} 
+\item{pvalue}{p-values for testing coefficients;} 
 
 }
 

@@ -12,7 +12,7 @@
 }
 
 \usage{  
-get.fixed(object, part = c("dist", "zero"), vr.name, sort.p = FALSE)
+get.fixed(object, part=c("dist", "zero"), vr.name, adj.p=FALSE, sort.p=FALSE)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -26,6 +26,9 @@ get.fixed(object, part = c("dist", "zero"), vr.name, sort.p = FALSE)
   \item{vr.name}{
   name of a variable or response. 
 }
+  \item{adj.p}{
+  adjust p-values using FDR method. 
+  }
   \item{sort.p}{
   sort by the p-values into ascending order.
   }
@@ -37,7 +40,7 @@ get.fixed(object, part = c("dist", "zero"), vr.name, sort.p = FALSE)
 }
 
 \value{
-  A matrix consists of the estimates, standard deviations and p-values of fixed effects for the response or variable.
+  A matrix consists of the estimates, standard deviations, and p-values of fixed effects for the response or variable.
 }
 
 \references{
