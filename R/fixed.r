@@ -1,11 +1,11 @@
 
 
-fixed <- function(object)
+fixed <- function(object, adj.p = FALSE)
 {
   if ("nbmm" %in% class(object)) res <- fixed.nb(object)
   if (all(class(object)=="lme")) res <- fixed.lme(object)
   if ("zinbmm" %in% class(object) | "zigmm" %in% class(object)) res <- fixed.zi(object)
-  if ("mms" %in% class(object)) res <- fixed.mms(object)
+  if ("mms" %in% class(object)) res <- fixed.mms(object, adj.p = adj.p)
   res
 }
 
@@ -61,7 +61,7 @@ fixed.zi <- function(object)
   res
 }
 
-fixed.mms <- function(object) 
+fixed.mms <- function(object, adj.p = FALSE) 
 {
   if (all(class(object)!="mms")) stop("only for mms()")
   fit <- object$fit
@@ -82,6 +82,20 @@ fixed.mms <- function(object)
     variables <- rownames(res[[k]])
     res[[k]] <- data.frame(responses, variables, res[[k]])
     rownames(res[[k]]) <- paste(res[[k]][,1], "--", res[[k]][,2], sep="")
+  }
+  
+  if (adj.p){
+    for (k in 1:length(res)){
+      res0 <- res[[k]]
+      vars <- unique(res0[, 2])
+      for(j in 1:length(vars))
+      {
+        p <- res0[res0[,2]==vars[j], "pvalue"]
+        nam <- rownames(res0[res0[,2]==vars[j], ])
+        res0[nam, "pvalue"] <- signif(p.adjust(p, method="fdr"), 2)
+      }
+      res[[k]] <- res0
+    }
   }
   
   res

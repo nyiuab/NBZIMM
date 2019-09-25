@@ -1,6 +1,6 @@
 
 
-get.fixed <- function(object, part=c("dist", "zero"), vr.name, sort.p=FALSE)
+get.fixed <- function(object, part=c("dist", "zero"), vr.name, adj.p=FALSE, sort.p=FALSE)
 {
   part <- part[1]
   if (class(object)[1] != "mms") stop("only for object from 'mms'")  
@@ -8,7 +8,7 @@ get.fixed <- function(object, part=c("dist", "zero"), vr.name, sort.p=FALSE)
   res <- object$responses
   var <- object$variables
   if (!vr.name %in% c(res, unlist(var))) stop("wrong name given")
-  ss <- fixed(object)[[part]]
+  ss <- fixed(object, adj.p=adj.p)[[part]]
   if (vr.name %in% res) {
     out <- ss[ss[, 1]==vr.name, ]
     rownames(out) <- out[, 2]  
