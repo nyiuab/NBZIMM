@@ -18,8 +18,17 @@ glmm.nb(fixed, random, data, correlation,
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{fixed, random, data, correlation}{ 
-  These arguments are the same as in the function \code{\link{lme}} in the package \bold{nlme}.
+  \item{fixed}{ 
+  a formula for the fixed-effects part, including the outcome. This argument is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
+}
+  \item{random}{ 
+  a formula for the random-effects part. It only contain the right-hand side part, e.g., ~ time | id, where time is a variable, and id the grouping factor. This argument is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
+}
+  \item{data}{ 
+  a data.frame containing all the variables. 
+}
+  \item{correlation}{ 
+  an optional correlation structure. It is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
 }
   \item{niter}{
   maximum number of iterations. 

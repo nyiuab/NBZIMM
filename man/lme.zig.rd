@@ -12,20 +12,27 @@
 }
 
 \usage{  
-lme.zig(fixed, random, data, correlation, zi.random = FALSE,
+lme.zig(fixed, random, data, correlation, 
+        zi_fixed = ~1, zi_random = NULL,
         niter = 30, epsilon = 1e-05, verbose = TRUE, ...)  
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{fixed}{ 
-  symbolic description of the fixed-effects part of the model, see details.
+  a formula for the fixed-effects part of the Gaussian model, including the continuous normal outcome. This argument is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
 }
-  \item{random, data, correlation}{ 
-  These arguments are the same as in the function \code{\link{lme}} in the package \bold{nlme}.
+  \item{random}{ 
+  a formula for the random-effects part of the Gaussian model. It only contain the right-hand side part, e.g., ~ time | id, where time is a variable, and id the grouping factor. This argument is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
 }
-\item{zi.random}{
-  logical. If \code{TRUE}, include the random effect specified by \code{random} in the zero-inflation part. 
+  \item{data}{ 
+  a data.frame containing all the variables. 
+}
+  \item{correlation}{ 
+  an optional correlation structure. It is the same as in the function \code{\link{lme}} in the package \bold{nlme}.
+}
+  \item{zi_fixed, zi_random}{
+  formulas for the fixed and random effects of the zero inflated part. only contain the right-hand side part. 
 }
   \item{niter}{
   maximum number of iterations. 
@@ -36,20 +43,17 @@ lme.zig(fixed, random, data, correlation, zi.random = FALSE,
   \item{verbose}{
   logical. If \code{TRUE}, print out number of iterations and computational time.
 }
-\item{...}{
+  \item{...}{
   further arguments for \code{\link{lme}}.  
 }
 
 }
 
 \details{
-  Zero-inflated gaussian models are two-component mixture models combining a point mass at zero with Gaussian (normal) for continuous outcome. Thus, there are two sources of zeros: zeros may come from either the point mass at zero or the normal distribution. For modeling the unobserved state, a logistic model (logistic mixed model if \code{zi.random = TRUE}) is used.
-
- The argument \code{fixed} is to specify the fixed-effects part in both components of the model: \code{fixed = y ~ x | z} giving the fixed-effects part of the distribution model y ~ x conditional on (|) the zero-inflation model ~ z. A different (or same) set of fixed-effects covariates could be used for the distribution component and zero-inflation component. If \code{fixed = y ~ x}, then the same covariates are employed in both components, equivalent to y ~ x | x. The simplest zero-inflation model only includes an intercept: y ~ x | 1, and thus all zeros have the same probability of belonging to the zero component. Offsets can be specified in both components of the model : y ~ x + offset(x1) | z + offset(z1).
+  Zero-inflated gaussian models are two-component mixture models combining a point mass at zero with Gaussian (normal) for continuous outcome. Thus, there are two sources of zeros: zeros may come from either the point mass at zero or the normal distribution. For modeling the unobserved state, a logistic model (or logistic mixed model) is used.
   
   The function is an alteration of the function \code{\link{glmmPQL}} in the package \bold{MASS}, which fits generalized linear mixed models using Penalized Quasi-Likelihood and works by repeated calls to the function \code{\link{lme}} in the package \bold{nlme}. It incorporates EM algorithms into the procedure of \code{\link{glmmPQL}} to fit zero-inflated mixed models for analyzing zero-inflated continuous responses in mutilevel study designs, for example, clustered and longitudinal studies. The function allows for multiple and correlated group-specific (random) effects (the argument \code{random}) and various types of within-group correlation structures (the argument \code{correlation}) described by \code{\link{corStruct}} in the package \bold{nlme}. 
   
-  Missing data may not be properly handled in some situations and thus should be removed before the analysis. 
 }
 
 \value{
@@ -58,8 +62,6 @@ lme.zig(fixed, random, data, correlation, zi.random = FALSE,
   The object contains additional components for the zero-inflation part: 
 \item{zero.prob}{the zero-state probabilities;}
 \item{zero.indicator}{the conditional expectations of the zero indicators;}
-\item{xz}{the design matrix of the zero-inflation part;}  
-\item{offsetz}{the offset of the zero-inflation part;}
 \item{fit.zero}{the fitted logistic (mixed) model for the zero-inflation part;}
 }
 
@@ -113,7 +115,9 @@ nonzero.p = non[[1]]
 y = otu[, names(nonzero.p)[1]]
 
 y0 = log(y+1)
-f = lme.zig(y0 ~ Days + Age + Race + preg + offset(log(N)) | 1, random = ~ 1 | subject) 
+data = data.frame(y0=y0, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
+f = lme.zig(fixed = y0 ~ Days + Age + Race + preg + offset(log(N)), 
+            random = ~ 1 | subject, data = data) 
 summary(f)
 fixed(f)
 summary(f$fit.zero)

@@ -17,7 +17,7 @@
   Package: \tab NBZIMM\cr
   Type: \tab Package\cr
   Version: \tab 1.0\cr
-  Date: \tab 2019-02-01\cr
+  Date: \tab 2019-12-01\cr
   License: \tab MIT\cr
   LazyLoad: \tab yes\cr
   }

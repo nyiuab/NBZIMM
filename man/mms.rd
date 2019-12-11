@@ -13,7 +13,8 @@
 
 \usage{  
 mms(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
-    correlation, zi.random = FALSE, niter = 30, epsilon = 1e-05,   
+    correlation, zi_fixed = ~1, zi_random = NULL,
+    niter = 30, epsilon = 1e-05,   
     min.p = 0, sort = FALSE, verbose = TRUE)
 }
 
@@ -25,7 +26,7 @@ mms(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
   \item{fixed}{ 
   a one-sided formula of the form \code{~ x} (i.e., the respose is omitted); the right side of \code{~} is the same as in \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, or \code{\link{lme.zig}}. 
 }
-  \item{data, random, correlation, zi.random, niter, epsilon, verbose}{ 
+  \item{data, random, correlation, zi_fixed, zi_random, niter, epsilon, verbose}{ 
   These arguments are the same as in \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, or \code{\link{lme.zig}}.
 }
 \item{method}{
@@ -91,10 +92,16 @@ subject = sam[, "Subect_ID"]; table(subject)
 
 # analyze all taxa with a given nonzero proportion
 
+data = data.frame(y=y, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
 f = mms(y = otu, fixed = ~ Days + Age + Race + preg + offset(log(N)), 
-        random = ~ 1 | subject,
+        random = ~ 1 | subject, data = data,
         min.p = 0.2, method = "nb")
-        
+f = mms(y = otu, fixed = ~ Days + Age + Race + preg + offset(log(N)), 
+        random = ~ 1 | subject, zi_fixed = ~1, data = data,
+        min.p = 0.2, method = "zinb")
+f = mms(y = log2(otu+1), fixed = ~ Days + Age + Race + preg + offset(log(N)), 
+        random = ~ 1 | subject, zi_fixed = ~1, data = data,
+        min.p = 0.2, method = "zig")        
 
 out = fixed(f)$dist
 out = out[out[,2]!="(Intercept)", ]
