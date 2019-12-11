@@ -2,12 +2,11 @@ Package: NBZIMM
 Type: Package
 Title: Negative Binomial and Zero-Inflated Mixed Models
 Version: 1.0
-Date: 2019-02-01
+Date: 2019-12-01
 Author: Nengjun Yi <nyi@uab.edu>
 Maintainer: Nengjun Yi <nyi@uab.edu>
 Description: Functions for setting up and fitting negative binomial mixed models, and zero-inflated negative binomial and Gaussian mixed models. These functions can be used to analyze general count data but also large-scale count data with multilevel structures.  
-License: MIT + file LICENSE
+License: MIT
 LazyLoad: yes
 LazyData: yes
-Suggests: knitr, rmarkdown
-VignetteBuilder: R.rsp, knitr
+VignetteBuilder: knitr, R.rsp
