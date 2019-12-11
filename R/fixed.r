@@ -43,10 +43,8 @@ fixed.zi <- function(object)
   dist[, 3] <- signif(dist[, 3], 2)
   colnames(dist) <- c("Estimate", "Std.Error", "pvalue")
   
-  if(is.na(object$fit.zero[1])) {
-    zero <- matrix(NA, nrow=ncol(object$xz), ncol=3)
-    rownames(zero) <- colnames(object$xz)
-  }
+  if(is.na(object$fit.zero[1])) 
+    zero <- matrix(NA, nrow=1, ncol=3)
   else{
     zi.random <- any(class(object$fit.zero)=="lme")
     if (zi.random) zero <- summary(object$fit.zero)$tTable 

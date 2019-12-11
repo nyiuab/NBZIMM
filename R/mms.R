@@ -1,11 +1,13 @@
 
 mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
-                correlation, zi.random = FALSE, niter = 30, epsilon = 1e-05,  
+                correlation, zi_fixed = ~1, zi_random = NULL, 
+                niter = 30, epsilon = 1e-05,  
                 min.p = 0, sort = FALSE, verbose = TRUE)
 {
   if (!requireNamespace("nlme")) install.packages("nlme")
   library(nlme)
   start.time <- Sys.time()
+  if (missing(data)) stop("'data' should be specified")
   
   call <- match.call()
   method <- method[1]
@@ -22,7 +24,6 @@ mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
     if (length(sub) == 0) stop("min.p is too large: no response") 
     else y <- y[, sub, drop = FALSE]
   }
-  if (missing(data)) data <- NULL
   if (missing(correlation)) correlation <- NULL
   
   if (verbose) cat("Analyzing", ncol(y), "responses: \n")
@@ -40,11 +41,13 @@ mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
       if (method == "lme")
         fit[[j]] <- lme(fixed = fm, random = random, data = data1, correlation = correlation) 
       if (method == "zinb")
-        fit[[j]] <- glmm.zinb(fixed = fm, random = random, data = data1, correlation = correlation, zi.random = zi.random, 
-                            niter = niter, epsilon = epsilon, verbose = FALSE) 
-      if (method == "zig")
-        fit[[j]] <- lme.zig(fixed = fm, random = random, data = data1, correlation = correlation, zi.random = zi.random, 
+        fit[[j]] <- glmm.zinb(fixed = fm, random = random, data = data1, correlation = correlation, 
+                              zi_fixed = zi_fixed, zi_random = zi_random, 
                               niter = niter, epsilon = epsilon, verbose = FALSE) 
+      if (method == "zig")
+        fit[[j]] <- lme.zig(fixed = fm, random = random, data = data1, correlation = correlation, 
+                            zi_fixed = zi_fixed, zi_random = zi_random, 
+                            niter = niter, epsilon = epsilon, verbose = FALSE) 
       if (verbose) cat(j, "")
       
     }, error = function(e) {cat("\n", "y", j, " error: ", conditionMessage(e), sep="")} )

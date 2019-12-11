@@ -65,7 +65,7 @@ glmm.nb <- function (fixed, random, data, correlation,
       fit <- eval(mcall)
       etaold <- eta
       eta <- fitted(fit) + off
-      if (sum((eta - etaold)^2) < epsilon * sum(eta^2)) break
+      if (i > 1 & sum((eta - etaold)^2) < epsilon * sum(eta^2)) break
       mu <- fam$linkinv(eta)
       mu.eta.val <- fam$mu.eta(eta)
       mu.eta.val <- ifelse(mu.eta.val == 0, 1e-04, mu.eta.val)  

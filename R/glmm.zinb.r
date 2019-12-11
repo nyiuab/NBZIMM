@@ -1,26 +1,19 @@
 
 # modify "glmmPQL" in package MASS
 
-glmm.zinb <- function (fixed, random, data, correlation, zi.random = FALSE, 
+glmm.zinb <- function (fixed, random, data, correlation, 
+                       zi_fixed = ~1, zi_random = NULL,
                        niter = 30, epsilon = 1e-05, verbose = TRUE, ...)
-{
+{ 
   if (!requireNamespace("nlme")) install.packages("nlme")
   if (!requireNamespace("MASS")) install.packages("MASS") 
   library(nlme)
   library(MASS)
   
     start.time <- Sys.time()
+    if (missing(data)) stop("'data' should be specified")
     family <- NegBin()
-    
     m <- mcall <- Call <- match.call()
-    
-    data0 <- environment(fixed)
-    tf <- two.fm(formula = fixed, data = data0) 
-    fixed <- tf$fmc
-    xz <- xz0 <- tf$Z
-    offsetz <- tf$offsetz
-    if (colnames(xz)[1]=="(Intercept)") xz <- xz[, -1, drop = FALSE]
-    
     nm <- names(m)[-1L]
     keep <- is.element(nm, c("weights", "data", "subset", "na.action"))
     for (i in nm[!keep]) m[[i]] <- NULL
@@ -71,14 +64,15 @@ glmm.zinb <- function (fixed, random, data, correlation, zi.random = FALSE,
     y <- fit0$y 
     if (all(y != 0)) stop("invalid response: no zero")
     zp <- ifelse(y!=0, 0, 0.5)
-
+    fm <- zp ~ .
+    fm[[3]] <- zi_fixed[[2]]
     zero.eta <- fit.zinb <- NA
        
     for (i in seq_len(niter)) {
       fit <- eval(mcall)
       etaold <- eta
       eta <- fitted(fit) + off
-      if (sum((eta - etaold)^2) < epsilon * sum(eta^2)) break
+      if (i > 1 & sum((eta - etaold)^2) < epsilon * sum(eta^2)) break
       mu <- fam$linkinv(eta)
       mu.eta.val <- fam$mu.eta(eta)
       mu.eta.val <- ifelse(mu.eta.val == 0, 1e-04, mu.eta.val)  
@@ -95,19 +89,14 @@ glmm.zinb <- function (fixed, random, data, correlation, zi.random = FALSE,
       if (is.null(th)) th <- fam$theta
       fam <- NegBin(theta = th)
       
-      if (!zi.random){ 
-        if (ncol(xz) > 0)
-          fit.zinb <- suppressWarnings(glm(zp ~ ., offset=offsetz, family=binomial, data=data.frame(xz)))
-        else fit.zinb <- suppressWarnings(glm(zp ~ 1, offset=offsetz, family=binomial))
+      if (is.null(zi_random)){
+        fit.zinb <- suppressWarnings(glm(fm, family=binomial, data=data))
         zero.eta <- fit.zinb$linear.predictors
       }
       else{
-        if (ncol(xz) > 0){
-          z <- xz
-          fit.zinb <- suppressWarnings(glmmPQL(fixed=zp ~ z + offset(offsetz), random=random, family=binomial, verbose = FALSE)) 
-        }
-        else fit.zinb <- suppressWarnings(glmmPQL(fixed=zp ~ 1 + offset(offsetz), random=random, family=binomial, verbose = FALSE))
-        zero.eta <- fitted(fit.zinb) + offsetz
+        fit.zinb <- suppressWarnings(glmmPQL(fixed=fm, random=zi_random, family=binomial, data=data, verbose = FALSE))
+        zero.eta <- fitted(fit.zinb)
+        if (!is.null(fit.zinb$offset)) zero.eta <- zero.eta + fit.zinb$offset
       }
       
       den <- dnbinom(y, size = th, mu = mu)
@@ -128,9 +117,7 @@ glmm.zinb <- function (fixed, random, data, correlation, zi.random = FALSE,
     fit$zero.indicator <- zp
     fit$zero.prob <- exp(zero.eta)/(1 + exp(zero.eta))
     fit$fit.zero <- fit.zinb 
-    fit$xz <- xz0
-    fit$offsetz <- offsetz
-    
+
     oldClass(fit) <- c("zinbmm", oldClass(fit))
     
     stop.time <- Sys.time()
