@@ -8,13 +8,6 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
 
 # Installation
 
-Two ways to install the package in R:
+ibrary(remotes)
 
-1. With Vignettes (must install packages: devtools, knitr, R.rsp)
-```{r}
-devtools::install_github("nyiuab/NBZIMM", build_opts = c("--no-resave-data", "--no-manual"), force = T)
-```
-2. Without Vignettes (must install package: devtools)
-```{r}
-devtools::install_github("nyiuab/NBZIMM", force = T)
-```
+install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
