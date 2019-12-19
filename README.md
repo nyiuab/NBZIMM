@@ -8,6 +8,6 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
 
 # Installation
 
-library(remotes)
+ library(remotes)
 
-install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
+ install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
