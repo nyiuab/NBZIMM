@@ -9,4 +9,4 @@ Description: Functions for setting up and fitting negative binomial mixed models
 License: MIT
 LazyLoad: yes
 LazyData: yes
-VignetteBuilder: knitr, R.rsp
+VignetteBuilder: knitr, R.rsp, rmarkdown
