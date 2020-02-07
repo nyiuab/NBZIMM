@@ -4,7 +4,6 @@ get.fixed <- function(object, part=c("dist", "zero"), vr.name, adj.p=FALSE, sort
 {
   part <- part[1]
   if (class(object)[1] != "mms") stop("only for object from 'mms'")  
-  if (!(class(object)[2] %in% c("zinb", "zig"))) part <- "dist"
   res <- object$responses
   var <- object$variables
   if (!vr.name %in% c(res, unlist(var))) stop("wrong name given")

@@ -1,8 +1,8 @@
 
-mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
-                correlation, zi_fixed = ~1, zi_random = NULL, 
-                niter = 30, epsilon = 1e-05,  
-                min.p = 0, sort = FALSE, verbose = TRUE)
+mms <- function(y, fixed, random, data, method=c("nb", "lme", "zinb", "zig"),
+                correlation, zi_fixed= ~1, zi_random=NULL, 
+                niter=30, epsilon=1e-05,  
+                min.p=0, sort=FALSE, verbose=TRUE)
 {
   if (!requireNamespace("nlme")) install.packages("nlme")
   library(nlme)
@@ -11,22 +11,10 @@ mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
   
   call <- match.call()
   method <- method[1]
-  y <- as.matrix(y)
-  if (is.null(rownames(y))) rownames(y) <- paste("v", 1:nrow(y), sep = "")
-  if (is.null(colnames(y))) colnames(y) <- paste("y", 1:ncol(y), sep = "")
-  nonzero.p <- apply(y, 2, function(z) {length(z[z != 0])/length(z)} )
-  if (sort){
-    nonzero.p <- sort(nonzero.p, decreasing = T)
-    y <- y[, names(nonzero.p), drop = FALSE]
-  }
-  if (ncol(y) > 1 & min.p > 0){
-    sub <- names(nonzero.p[nonzero.p > min.p])
-    if (length(sub) == 0) stop("min.p is too large: no response") 
-    else y <- y[, sub, drop = FALSE]
-  }
+  y <- nonzero(y=y, min.p=min.p, sort=sort)$y.filter
   if (missing(correlation)) correlation <- NULL
   
-  if (verbose) cat("Analyzing", ncol(y), "responses: \n")
+  if (verbose) cat("Analyzing", NCOL(y), "responses: \n")
   fm <- y.one ~ .
   fm[[3]] <- fixed[[2]]
   fit <- vector(mode="list", length=NCOL(y))
@@ -64,6 +52,53 @@ mms <- function(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
   
   stop.time <- Sys.time()
   minutes <- round(difftime(stop.time, start.time, units = "min"), 3)
+  if (verbose) 
+    cat("\n Computational time:", minutes, "minutes \n")
+  
+  res
+}
+
+
+mms.GLMMadaptive <- function(y, fixed, random, data, family,
+                            zi_fixed=NULL, zi_random=NULL, penalized=FALSE,
+                            min.p=0, sort=FALSE, verbose=TRUE)
+{
+  if (!requireNamespace("GLMMadaptive")) install.packages("GLMMadaptive")
+  library(GLMMadaptive)
+  start.time <- Sys.time()
+  if (missing(data)) stop("'data' should be specified")
+  
+  call <- match.call()
+  y <- nonzero(y=y, min.p=min.p, sort=sort)$y.filter
+  
+  if (verbose) cat("Analyzing", NCOL(y), "responses: \n")
+  fm <- y.one ~ .
+  fm[[3]] <- fixed[[2]]
+  fit <- vector(mode="list", length=NCOL(y))
+  names(fit) <- colnames(y)
+  for (j in 1:ncol(y)){
+    y.one <- y[, j]
+    data1 <- as.data.frame(cbind(y.one, data))
+    tryCatch( {
+      fit[[j]] <- mixed_model(fixed=fm, random=random, data=data1, family=family, 
+                              zi_fixed=zi_fixed, zi_random=zi_random, penalized=penalized) 
+      if (verbose) cat(j, "")
+      
+    }, error = function(e) {cat("\n", "y", j, " error: ", conditionMessage(e), sep="")} )
+  } 
+  fit <- fit[!sapply(fit, is.null)]
+  
+  responses <- names(fit)
+  out <- summary(fit[[1]])
+  variables <- list(dist=rownames(out$coef_table))
+  if (!is.null(out$coef_table_zi)) 
+    variables$zero <- rownames(out$coef_table_zi)
+  
+  res <- list(fit=fit, responses=responses, variables=variables, call=call)
+  class(res) <- c("mms", class(fit[[1]]))
+  
+  stop.time <- Sys.time()
+  minutes <- round(difftime(stop.time, start.time, units="min"), 3)
   if (verbose) 
     cat("\n Computational time:", minutes, "minutes \n")
   

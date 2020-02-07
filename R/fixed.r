@@ -2,10 +2,17 @@
 
 fixed <- function(object, adj.p = FALSE)
 {
-  if ("nbmm" %in% class(object)) res <- fixed.nb(object)
-  if (all(class(object)=="lme")) res <- fixed.lme(object)
-  if ("zinbmm" %in% class(object) | "zigmm" %in% class(object)) res <- fixed.zi(object)
-  if ("mms" %in% class(object)) res <- fixed.mms(object, adj.p = adj.p)
+  if ("nbmm" %in% class(object)) 
+    res <- fixed.nb(object)
+  if (all(class(object)=="lme")) 
+    res <- fixed.lme(object)
+  if ("zinbmm" %in% class(object) | "zigmm" %in% class(object)) 
+    res <- fixed.zi(object)
+  if ("MixMod" %in% class(object) & !"mms" %in% class(object)) 
+    res <- fixed.GLMMadaptive(object)
+  if ("mms" %in% class(object)) 
+    res <- fixed.mms(object, adj.p = adj.p)
+  
   res
 }
 
@@ -59,6 +66,29 @@ fixed.zi <- function(object)
   res
 }
 
+fixed.GLMMadaptive <- function(object)
+{
+  out <- summary(object)
+  res <- out$coef_table[, c(1,2,4), drop=FALSE]
+  res[, c(1,2)] <- round(res[, c(1,2)], digits = 3)
+  res[, 3] <- signif(res[, 3], 2)
+  colnames(res) <- c("Estimate", "Std.Error", "pvalue")
+  res <- list(dist=res)
+  
+  res1 <- out$coef_table_zi
+  if (!is.null(res1)) 
+  {
+    res1 <- res1[, c(1,2,4), drop=FALSE]
+    res1[, c(1,2)] <- round(res1[, c(1,2)], digits = 3)
+    res1[, 3] <- signif(res1[, 3], 2)
+    colnames(res1) <- c("Estimate", "Std.Error", "pvalue")
+    res$zero <- res1
+  }
+  
+  res
+}
+  
+
 fixed.mms <- function(object, adj.p = FALSE) 
 {
   if (all(class(object)!="mms")) stop("only for mms()")
@@ -68,6 +98,7 @@ fixed.mms <- function(object, adj.p = FALSE)
   if (any(class(object)=="nb")) out <- lapply(fit, fixed.nb)
   if (any(class(object)=="lme")) out <- lapply(fit, fixed.lme)
   if (any(class(object) %in% c("zinb", "zig"))) out <- lapply(fit, fixed.zi)
+  if (any(class(object)=="MixMod")) out <- lapply(fit, fixed.GLMMadaptive)
 
   res <- vector(mode="list", length = length(out[[1]]))
   names(res) <- names(out[[1]])
