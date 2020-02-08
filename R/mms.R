@@ -1,8 +1,7 @@
 
 mms <- function(y, fixed, random, data, method=c("nb", "lme", "zinb", "zig"),
                 correlation, zi_fixed= ~1, zi_random=NULL, 
-                niter=30, epsilon=1e-05,  
-                min.p=0, sort=FALSE, verbose=TRUE)
+                niter=30, epsilon=1e-05, min.p=0, verbose=TRUE)
 {
   if (!requireNamespace("nlme")) install.packages("nlme")
   library(nlme)
@@ -11,7 +10,7 @@ mms <- function(y, fixed, random, data, method=c("nb", "lme", "zinb", "zig"),
   
   call <- match.call()
   method <- method[1]
-  y <- nonzero(y=y, min.p=min.p, sort=sort)$y.filter
+  y <- nonzero(y=y, min.p=min.p, sort=FALSE)$y.filter
   if (missing(correlation)) correlation <- NULL
   
   if (verbose) cat("Analyzing", NCOL(y), "responses: \n")
@@ -61,7 +60,7 @@ mms <- function(y, fixed, random, data, method=c("nb", "lme", "zinb", "zig"),
 
 mms.GLMMadaptive <- function(y, fixed, random, data, family,
                             zi_fixed=NULL, zi_random=NULL, penalized=FALSE,
-                            min.p=0, sort=FALSE, verbose=TRUE)
+                            min.p=0, verbose=TRUE)
 {
   if (!requireNamespace("GLMMadaptive")) install.packages("GLMMadaptive")
   library(GLMMadaptive)
@@ -69,7 +68,7 @@ mms.GLMMadaptive <- function(y, fixed, random, data, family,
   if (missing(data)) stop("'data' should be specified")
   
   call <- match.call()
-  y <- nonzero(y=y, min.p=min.p, sort=sort)$y.filter
+  y <- nonzero(y=y, min.p=min.p, sort=FALSE)$y.filter
   
   if (verbose) cat("Analyzing", NCOL(y), "responses: \n")
   fm <- y.one ~ .
