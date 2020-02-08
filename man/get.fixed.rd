@@ -27,7 +27,7 @@ get.fixed(object, part=c("dist", "zero"), vr.name, sort=FALSE)
   name of a variable or response. 
 }
   \item{sort}{
-  sort by the p-values into ascending order.
+  sort by the adjusted p-values into ascending order.
   }
 
 }
