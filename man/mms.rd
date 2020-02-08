@@ -14,8 +14,7 @@
 \usage{  
 mms(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
     correlation, zi_fixed = ~1, zi_random = NULL,
-    niter = 30, epsilon = 1e-05,   
-    min.p = 0, sort = FALSE, verbose = TRUE)
+    niter = 30, epsilon = 1e-05, min.p = 0, verbose = TRUE)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -36,9 +35,6 @@ mms(y, fixed, random, data, method = c("nb", "lme", "zinb", "zig"),
 }
 \item{min.p}{
   a value in [0, 1). The responses with the proportion of non-zero values > min.p are analyzed.
-}
-\item{sort}{
-  sort by the nonzero proportions of the responses into decreasing order.
 }
 \item{verbose}{
   logical. If \code{TRUE}, print out computational time.
