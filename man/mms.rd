@@ -87,12 +87,11 @@ Days = sam$GA_Days; Days = scale(Days)
 Age = sam$Age; Age = scale(Age)
 Race = sam$Race
 preg = sam$pregnant; table(preg)
-
 subject = sam[, "Subect_ID"]; table(subject)
 
 # analyze all taxa with a given nonzero proportion
 
-data = data.frame(y=y, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
+data = data.frame(Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
 f = mms(y = otu, fixed = ~ Days + Age + Race + preg + offset(log(N)), 
         random = ~ 1 | subject, data = data,
         min.p = 0.2, method = "nb")
@@ -101,24 +100,22 @@ f = mms(y = otu, fixed = ~ Days + Age + Race + preg + offset(log(N)),
         min.p = 0.2, method = "zinb")
 f = mms(y = log2(otu+1), fixed = ~ Days + Age + Race + preg + offset(log(N)), 
         random = ~ 1 | subject, zi_fixed = ~1, data = data,
-        min.p = 0.2, method = "zig")        
+        min.p = 0.2, method = "zig")
 
 out = fixed(f)$dist
 out = out[out[,2]!="(Intercept)", ]
-res = out[, 3:5]
 par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 12, 4, 4))
-plot.fixed(res=res, threshold=0.001, gap=500, col.pts=c("black", "grey"),
+plot.fixed(res=out[,c(3,4,6)], threshold=0.001, gap=500, col.pts=c("black", "grey"),
            cex.axis=0.6, cex.var=0.7)
 
-res = get.fixed(f, part="dist", vr.name="preg", sort.p=F)
+out = get.fixed(f, part="dist", vr.name="preg", sort=F)
 par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 10, 4, 4))
-plot.fixed(res, threshold=0.05, gap=300, main="Covariate: pregnant",
+plot.fixed(res=out[,c(1,2,4)], threshold=0.05, gap=300, main="Covariate: pregnant",
            cex.axis=0.6, cex.var=0.7)
-
 
 out = fixed(f)$dist
 out = out[out[,2]!="(Intercept)", ]
-g = heat.p(df=out, p.breaks = c(0.001, 0.01, 0.05), 
+g = heat.p(df=out[,1:5], p.breaks = c(0.001, 0.01, 0.05), 
        colors = c("black", "darkgrey", "grey", "lightgrey"),
        zigzag=c(T,F), abbrv=c(T,F), margin=c(2.5,0.5), y.size=8,
        legend=T)

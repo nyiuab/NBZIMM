@@ -98,13 +98,9 @@ Days = sam$GA_Days; Days = scale(Days)
 Age = sam$Age; Age = scale(Age)
 Race = sam$Race
 preg = sam$pregnant; table(preg)
-
 subject = sam[, "Subect_ID"]; table(subject)
 
-non = nonzero(y = otu, total = N, plot = F)
-nonzero.p = non[[1]]
-
-y = otu[, names(nonzero.p)[1]]
+y = otu[, 1]
 
 data = data.frame(y=y, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
 f = glmm.zinb(fixed = y ~ Days + Age + Race + preg + offset(log(N)), 

@@ -64,7 +64,7 @@ colnames(sam)
 N = sam[, "Total.Read.Counts"]  # total reads
 
 non = nonzero(y=otu, total=N, plot=T)
-non
+names(non)
 
 }
 
