@@ -1,7 +1,8 @@
 
+
 nonzero <- function(y, total, min.p=0, sort=TRUE, plot=FALSE)
 {
-  y <- as.matrix(y)
+  y <- as(y, "matrix")
   if (is.null(colnames(y))) colnames(y) <- paste("y", 1:ncol(y), sep = "")
   if(missing(total)) total <- rowSums(y)
   total <- unlist(total)
