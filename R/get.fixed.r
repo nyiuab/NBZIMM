@@ -19,7 +19,7 @@ get.fixed <- function(object, part=c("dist", "zero"), vr.name, sort=FALSE)
   out <- out[, 3:6]
   out <- out[rownames(out)!="(Intercept)", ]
   out <- as.matrix(out)
-  if (sort) out <- out[names(sort(out[, "pvalue"])), ]
+  if (sort) out <- out[names(sort(out[, "padj"])), ]
   
   out
 }
