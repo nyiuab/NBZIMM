@@ -83,6 +83,6 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
 
   grid.newpage()
   grid.draw(g)
-  return(g)
+  #return(g)
 }
 
