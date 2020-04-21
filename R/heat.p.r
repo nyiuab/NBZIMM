@@ -46,8 +46,6 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
   if (missing(y.size)) 
     y.size <- NULL
   
-    png('TMP_PLOT')
-
   p = ggplot(df, aes(variables, responses))
   p = p + xlab("") + ylab("")
   p = p + geom_tile(aes(fill = p_value))
@@ -66,11 +64,6 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
   else p = p + geom_text(data = df.sub, aes(variables, responses, 
                                             label = "+"), col = "white", size = symbol.size)
   p = p + labs(title=title, subtitle=subtitle)
-  #When you're done
-  dev.off()
-  #Delete the plot you just generated
-  unlink('TMP_PLOT')  
-  
   
   g = ggplotGrob(p)
   g$widths[3] = unit(left.margin, "cm")
@@ -89,7 +82,7 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
                grep = TRUE)
   }
 
-  grid.newpage()
+  #grid.newpage()
   grid.draw(g)
   #return(g)
 }
