@@ -11,3 +11,5 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
  library(remotes)
 
  install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
+
+# Methods
