@@ -30,12 +30,14 @@ There are three methods available to analyze microbiome data in NBZIMM. In all t
 
 # Tutorials
 
+For a tutorial of using the function glmm.nb to analyze microbiome data with **NBMMs** please see: 
 [NBMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/nbmms.md)
 
+For a tutorial of using the function glmm.zinb to analyze microbiome data with **ZINBMMs** please see: 
 [ZINBMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/zinbmms.md)
 
+For a tutorial of using the function lme.zig to analyze microbiome data with **ZIGMMs** please see: 
 [ZIGMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/zigmms.md)
-
 
 
 **License**: GPL
