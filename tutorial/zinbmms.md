@@ -9,13 +9,6 @@ nav: true
 
 This function sets up and fits zero-inflated negative binomial mixed models for analyzing zero-inflated count responses with multilevel data structures (for example, clustered data and longitudinal studies).
 
-## Installation
-You can install our NBZIMM package by downloading NBZIMM_1.0.zip.
-```r
-install.packages("NBZIMM")
-library(NBZIMM)
-```
-
 ## Usage
 ```r
 glmm.zinb(fixed, random, data, correlation, zi.random = FALSE, 
