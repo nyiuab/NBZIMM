@@ -9,17 +9,11 @@ nav: true
 
 The complex microbiome is inherently dynamic. The metagenomics sequencing data provide valuable resources for investigating the dynamic changes of microbial abundance over time and the associations between the microbiome and host environmental/clinical factors. The well-known properties of microbiome measurements include varied total sequence reads across samples, over-dispersion and zero-inflation. Additionally, microbiome studies usually collect samples longitudinally, which insert correlation among the samples and thus further complicate the analysis and interpretation of microbiome count data. In this article, we implement our proposed Negative Binomial mixed models (NBMMs) for detecting the association between the microbiome and host environmental/clinical factors for longitudinal microbiome data.
 
-## Installation
-You can install our NBZIMM package by downloading NBZIMM_1.0.zip or BhGLM_1.1.0.tar.gz.
-```r
-install.packages("NBZIMM")
-library(NBZIMM)
-```
-
 ## Usage
 ```r
 glmm.nb(fixed, random, data, subset, correlation, weights, control, niter = 30, epsilon = 1e-05, verbose = TRUE)
 ```
+
 ## Arguments
 
 - **fixed, random, data, subset, correlation, weights, control**: These arguments are the same as in the function lme in the package nlme.
