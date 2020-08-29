@@ -1,7 +1,3 @@
----
-title: NBZIMM ZIGMMs Longitudinal
-nav: true
----
 
 # NBZIMM - ZIGMMs (Zero-inflated Gaussian Mixed Model)
 
