@@ -20,12 +20,14 @@ There are three methods available to analyze microbiome data in NBZIMM.
 3. ZIGMMs
 
 
-# NBZIMM - NBMM (Negative Binomial Mixed Model)
+# Tutorials
 
 [NBMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/nbmms.md)
 
 [ZINBMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/zinbmms.md)
 
 [ZIGMMs](https://github.com/nyiuab/NBZIMM/tree/master/tutorial/zigmms.md)
+
+
 
 **License**: GPL
