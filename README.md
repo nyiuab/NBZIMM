@@ -19,8 +19,10 @@ There are three methods available to analyze microbiome data in NBZIMM. In all t
 ![](https://github.com/nyiuab/NBZIMM/blob/master/images/nbmms.PNG?raw=true)
 
 2. ZINBMMs
-3. ZIGMMs
+![](https://github.com/nyiuab/NBZIMM/blob/master/images/zinbmms.PNG?raw=true)
 
+3. ZIGMMs
+![](https://github.com/nyiuab/NBZIMM/blob/master/images/zigmms.PNG?raw=true)
 
 # Tutorials
 
