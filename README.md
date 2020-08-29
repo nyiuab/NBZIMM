@@ -16,9 +16,9 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
 
 There are three methods available to analyze microbiome data in NBZIMM. In all three methods, we separately analyze each microbiome taxon. 
 1. Negative Binomial mixed models (NBMMs)
-<img src="https://github.com/nyiuab/NBZIMM/tree/master/pics/nbmms.PNG" width="600" align="center">
+<img src="https://github.com/nyiuab/NBZIMM/tree/master/images/nbmms.PNG" width="600" align="center">
 
-![GitHub Logo](https://github.com/nyiuab/NBZIMM/tree/master/images/nbmms.png?raw=true)
+![GitHub Logo](https://github.com/nyiuab/NBZIMM/blob/master/images/nbmms.PNG?raw=true)
 
 2. ZINBMMs
 3. ZIGMMs
