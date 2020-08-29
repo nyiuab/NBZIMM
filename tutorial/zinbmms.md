@@ -1,8 +1,3 @@
----
-title: NBZIMM ZINBMMs Longitudinal
-nav: true
----
-
 # NBZIMM - ZINBMMs (Zero-inflated Negative Binomial Mixed Model)
 
 ## Introduction
