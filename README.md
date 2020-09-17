@@ -9,16 +9,17 @@ Author: Nengjun Yi nyi@uab.edu; Maintainer: Nengjun Yi nyi@uab.edu
 **License**: GPL
 
 # Installation
+The package without vignettes can be installed using the following R code:
 
- library(remotes)
+     library(remotes)
  
- install_github("nyiuab/NBZIMM", force=T, build_vignettes=F)
+     install_github("nyiuab/NBZIMM", force=T, build_vignettes=F)
  
- If you want to build Vignettes in the installation, please also install the R package R.rsp using the following R code.
+If you want to build Vignettes in the installation, please also install the R package R.rsp using the following R code.
  
- library(remotes)
+     library(remotes)
  
- install.packages("R.rsp")
+     install.packages("R.rsp")
  
  install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
  
