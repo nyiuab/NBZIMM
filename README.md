@@ -21,7 +21,7 @@ If you want to build Vignettes in the installation, please also install the R pa
  
      install.packages("R.rsp")
  
- install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
+     install_github("nyiuab/NBZIMM", force=T, build_vignettes=T)
  
 
 # Methods
