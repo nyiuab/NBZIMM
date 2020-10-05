@@ -62,81 +62,37 @@ zero.p$id = rownames(zero.p)
 zero.p = data.frame(zero.p[zero.p$zero.p>0.2 & zero.p$zero.p<0.8, ])
 yy = yy[, rownames(zero.p)]
 
+##########################
+## To fit a ZINBMM model, we need to use glmm.zinb funtion to analyze the taxa count data.
+### In the following code, we compared five different models using the function glmm.zinb to separately analyze each taxon for all taxa in the real data.
 
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    f17 = glmm.zinb(y ~ group + offset(log(N))|1, random = ~ 1|subject)
-    out29[j, ] = summary(f17)$tTable[2, 5]
+# choose the first taxon to demonstrate the examples:
+    y = as.numeric(yy[, 1])
     
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
+# The first model compared each taxon between two groups and an offset term for library size is needed in fixed effects. The random effect includes a random intercept. No fixed or random effects is considered for zero part. 
+    f1 = glmm.zinb(y ~ group + offset(log(N))|1, random = ~ 1|subject)
+    summary(f1)
+
+# The second model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept and a random slope of days. No fixed or random effects is considered for zero part. 
+    f2 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = list(subject = pdDiag(~days)))
+    summary(f2)
     
-    f18 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = list(subject = pdDiag(~days)))
-    out30[j, ] = summary(f18)$tTable[2, 5]
-    out31[j, ] = summary(f18)$tTable[4, 5]
+# The third model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept. No fixed or random effects is considered for zero part.
+    f3 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = ~ 1|subject)
+    summary(f3)
+
+# The fourth model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept. A correlation structure of AR1 is considered in this model. No fixed or random effects is considered for zero part.
+    f4 = glmm.zinb(y ~ group*days  + offset(log(N))|1, random = ~ 1|subject, correlation = corAR1()) 
+    summary(f4)
     
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f19 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = ~ 1|subject)
-    out32[j, ] = summary(f19)$tTable[2, 5]
-    out33[j, ] = summary(f19)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f20 = glmm.zinb(y ~ group*days  + offset(log(N))|1, random = ~ 1|subject, correlation = corAR1()) #random = list(subject = pdDiag(~days)))
-    out34[j, ] = summary(f20)$tTable[2, 5]
-    out35[j, ] = summary(f20)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f21 = glmm.zinb(y ~ group + offset(log(N)), random = ~ 1|subject)
-    out36[j, ] = summary(f21)$tTable[2, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f22 = glmm.zinb(y ~ group*days + offset(log(N)), random = list(subject = pdDiag(~days)))
-    out37[j, ] = summary(f22)$tTable[2, 5]
-    out38[j, ] = summary(f22)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f23 = glmm.zinb(y ~ group*days + offset(log(N)), random = ~ 1|subject)
-    out39[j, ] = summary(f23)$tTable[2, 5]
-    out40[j, ] = summary(f23)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    
-    f24 = glmm.zinb(y ~ group*days  + offset(log(N)),random = ~ 1|subject, correlation = corAR1()) # random = list(subject = pdDiag(~days)))
-    out41[j, ] = summary(f24)$tTable[2, 5]
-    out42[j, ] = summary(f24)$tTable[4, 5]      
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
+# The fifth model compared each taxon between two groups and an offset term for library size is needed in fixed effects. The random effect includes a random intercept. Group is considered for fixed effects in zero part. 
+    f5 = glmm.zinb(y ~ group + offset(log(N))|group, random = ~ 1|subject)
+    summary(f5)
+       
+For all taxa, we can analyze them using the fuction mms for all the above models. For demonstration, we use mms for the first model:
+# The first model:
+f = mms(y = yy, fixed = group + offset(log(N))|1, 
+        random = ~ 1 | subject, data = data,
+        min.p = 0.2, method = "zinb")
+        
 ```
