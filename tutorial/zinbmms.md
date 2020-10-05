@@ -27,7 +27,6 @@ The Romero's preterm DATASET
 ```r
 rm(list = ls())
 
-library(BhGLM)
 library(NBZIMM)
 library(nlme)
 
@@ -43,24 +42,17 @@ colnames(clinical)
 
 group = ifelse(clinical$Pregnancy.outcome == "TERM", 1, 0)
 
+# Library size as offset
 N = clinical[, "Total.Read.Countsb"]  # total reads
-mean(N); sd(N)
-mean(log(N)); sd(log(N))
 
+# Variables for fitting the models
 subject = clinical[, "subject.ID"]
-sample_id = clinical[, "sample.ID"]
-CST = clinical[, "CST"]
 clinical$group = group
-
 ## pregnant women vs non-pregnant women measurement time in weeks
 days = clinical[, "calculated.GA..weeks."]
 
+# Remove taxa with proportions of zeros between 0.2-0.8.
 pheno = round(otu[, -c(1,2)]/100*N)
-
-#pheno = pheno[rownames(clinical), ]
-dim(pheno)
-colnames(pheno)
-
 yy = as.matrix(pheno)  
 yy = ifelse(is.na(yy), 0, yy)
 zero.p = apply(yy, 2, function(x) {length(x[x != 0])/length(x)} )
@@ -70,175 +62,6 @@ zero.p$id = rownames(zero.p)
 zero.p = data.frame(zero.p[zero.p$zero.p>0.2 & zero.p$zero.p<0.8, ])
 yy = yy[, rownames(zero.p)]
 
-##########################
-## LMM model
-### compare random intercept model with random slope (dropping the correlation between random intercept and slope) model
-f1 = f2 = f3 = f4 = f5 = f6 = f7 = f8 = f9 = f10 = f11 = f12 = f13 = f14 = f15 = f16 = list()
-f17 = f18 = f19 = f20 = f21 = f22 = f23 = f24 = list()
-out1 = out2 = out3 = out4 = out5 = out6 = out7 = out8 = out9 = out10 = out11 = out12 = out13 = out14 = out15 = out16 = out17 = out18 = matrix(NA, ncol(yy), 1)
-out19 = out20 = out21 = out22 = out23 = out24 = matrix(NA, ncol(yy), 1)
-out25 = out26 = out27 = out28 = out29 = out30 = matrix(NA, ncol(yy), 1)
-out31 = out32 = out33 = out34 = out35 = out36 = matrix(NA, ncol(yy), 1)
-out37 = out38 = out39 = out40 = out41 = out42 = matrix(NA, ncol(yy), 1)
-
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = yy[, j]
-    y0 = asin(sqrt(y/N))
-    f1 = lme(y0 ~ group, random = ~ 1|subject)
-    out1[j, ] = summary(f1)$tTable[2, 5]
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-
-
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = yy[, j]
-    y0 = asin(sqrt(y/N))
-    f2 = lme(y0 ~ group*days, random = list(subject = pdDiag(~days)))
-    out2[j, ] = summary(f2)$tTable[2, 5]
-    out3[j, ] = summary(f2)$tTable[4, 5]
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-
-
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = yy[, j]
-    y0 = asin(sqrt(y/N))
-    f3 = lme(y0 ~ group*days, random = ~ 1|subject)
-    out4[j, ] = summary(f3)$tTable[2, 5]
-    out5[j, ] = summary(f3)$tTable[4, 5]
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-
-
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = yy[, j]
-    y0 = asin(sqrt(y/N))
-    f4 = lme(y0 ~ group*days, random = ~ 1|subject, correlation = corAR1()) #random = list(subject = pdDiag(~days)))
-    out6[j, ] = summary(f4)$tTable[2, 5]
-    out7[j, ] = summary(f4)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-#out_lmm <- cbind(out1, out2, out4, out5, out6, out7)
-
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    f9 = glmm.nb(y ~ group + offset(log(N)), random = ~ 1|subject)
-    out8[j, ] = summary(f9)$tTable[2, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    f10 = glmm.nb(y ~ group*days + offset(log(N)), random = list(subject = pdDiag(~days)))
-    out9[j, ] = summary(f10)$tTable[2, 5]
-    out10[j, ] = summary(f10)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    f11 = glmm.nb(y ~ group*days + offset(log(N)), random = ~ 1|subject)
-    out11[j, ] = summary(f11)$tTable[2, 5]
-    out12[j, ] = summary(f11)$tTable[4, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    f12 = glmm.nb(y ~ group*days+ offset(log(N)), random = ~ 1|subject, correlation = corAR1()) # random = list(subject = pdDiag(~days)))
-    out13[j, ] = summary(f12)$tTable[2, 5]
-    out14[j, ] = summary(f12)$tTable[4, 5]
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-#out_nbmm <- cbind(out13, out14, out15, out16, out17, out18)
-
-##########################
-## ZIGMM model
-### compare random intercept model with random slope (dropping the correlation between random intercept and slope) model
-#di = matrix(NA, ncol(yy), 3)
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f5 = lme.zig(y1 ~ group + offset(log(N))|1, random = ~ 1|subject)
-    out15[j, ] = summary(f5)$tTable[2, 5]
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f6 = lme.zig(y1 ~ group*days + offset(log(N))|1, random = list(subject = pdDiag(~days)))
-    out16[j, ] = summary(f6)$tTable[2, 5]
-    out17[j, ] = summary(f6)$tTable[4, 5]
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f7 = lme.zig(y1 ~ group*days + offset(log(N))|1, random = ~ 1|subject)
-    out18[j, ] = summary(f7)$tTable[2, 5]
-    out19[j, ] = summary(f7)$tTable[4, 5]    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f8 = lme.zig(y1 ~ group*days+ offset(log(N))|1, random = ~ 1|subject, correlation = corAR1()) #random = list(subject = pdDiag(~days)))
-    out20[j, ] = summary(f8)$tTable[2, 5]
-    out21[j, ] = summary(f8)$tTable[4, 5]    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f13 = lme.zig(y1 ~ group+ offset(log(N)), random = ~ 1|subject)
-    out22[j, ] = summary(f13)$tTable[2, 5]    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f14 = lme.zig(y1 ~ group*days + offset(log(N)), random = list(subject = pdDiag(~days)))
-    out23[j, ] = summary(f14)$tTable[2, 5]
-    out24[j, ] = summary(f14)$tTable[4, 5]    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f15 = lme.zig(y1 ~ group*days + offset(log(N)), random = ~ 1|subject)
-    out25[j, ] = summary(f15)$tTable[2, 5]
-    out26[j, ] = summary(f15)$tTable[4, 5]
-    
-    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-for (j in 1:ncol(yy)){
-  tryCatch({
-    y = as.numeric(yy[, j])
-    y1 = log2(y + 1)#asin(sqrt(y/N))
-    f16 = lme.zig(y1 ~ group*days+ offset(log(N)), random = ~ 1|subject, correlation = corAR1()) #random = list(subject = pdDiag(~days)))
-    out27[j, ] = summary(f16)$tTable[2, 5]
-    out28[j, ] = summary(f16)$tTable[4, 5]    
-  }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-}
-#out_zigmm <- cbind(out2, out4, out6, out8, out10, out12)
 
 for (j in 1:ncol(yy)){
   tryCatch({
