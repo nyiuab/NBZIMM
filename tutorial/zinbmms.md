@@ -68,31 +68,37 @@ yy = yy[, rownames(zero.p)]
 
 # choose the first taxon to demonstrate the examples:
     y = as.numeric(yy[, 1])
-    
+
+data = cbind.data.frame(y, subject, group, N)
+
 # The first model compared each taxon between two groups and an offset term for library size is needed in fixed effects. The random effect includes a random intercept. No fixed or random effects is considered for zero part. 
-    f1 = glmm.zinb(y ~ group + offset(log(N))|1, random = ~ 1|subject)
+    f1 = glmm.zinb(y ~ group + offset(log(N)), data = data, 
+               random = ~ 1|subject, zi_fixed = ~1, zi_random =NULL)
     summary(f1)
 
 # The second model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept and a random slope of days. No fixed or random effects is considered for zero part. 
-    f2 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = list(subject = pdDiag(~days)))
+    f2 = glmm.zinb(y ~ group*days + offset(log(N)), data = data, 
+               random = list(subject = pdDiag(~days)), zi_fixed = ~1, zi_random =NULL)
     summary(f2)
     
 # The third model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept. No fixed or random effects is considered for zero part.
-    f3 = glmm.zinb(y ~ group*days + offset(log(N))|1, random = ~ 1|subject)
+    f3 =  glmm.zinb(y ~ group*days + offset(log(N)), data = data, 
+               random = ~ 1|subject, zi_fixed = ~1, zi_random =NULL)
     summary(f3)
 
 # The fourth model compared each taxon between two groups, while controlling days, and group by days interaction. And an offset term for library size is needed in fixed effects. The random effect includes a random intercept. A correlation structure of AR1 is considered in this model. No fixed or random effects is considered for zero part.
-    f4 = glmm.zinb(y ~ group*days  + offset(log(N))|1, random = ~ 1|subject, correlation = corAR1()) 
+    f4 = glmm.zinb(y ~ group*days  + offset(log(N)), data = data, 
+               random = ~ 1|subject, zi_fixed = ~1, zi_random =NULL, correlation = corAR1()) 
     summary(f4)
     
 # The fifth model compared each taxon between two groups and an offset term for library size is needed in fixed effects. The random effect includes a random intercept. Group is considered for fixed effects in zero part. 
-    f5 = glmm.zinb(y ~ group + offset(log(N))|group, random = ~ 1|subject)
+    f5 = glmm.zinb(y ~ group + offset(log(N)), zi_fixed = ~group, zi_random =NULL,, random = ~ 1|subject)
     summary(f5)
        
 For all taxa, we can analyze them using the fuction mms for all the above models. For demonstration, we use mms for the first model:
 # The first model:
-f = mms(y = yy, fixed = group + offset(log(N))|1, 
-        random = ~ 1 | subject, data = data,
+f = mms(y = yy, fixed = group + offset(log(N)), 
+        random = ~ 1 | subject, data = data,zi_fixed = ~1, zi_random =NULL,
         min.p = 0.2, method = "zinb")
         
 ```
