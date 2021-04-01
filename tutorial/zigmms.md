@@ -63,7 +63,7 @@ fixed(f1)
 summary(f1$fit.zero)
 
 
-f2 = mms(y = Romero$OTU, fixed = ~ GA_Days + Age + Race + pregnant + 
+f2 = mms(y = log(Romero$OTU+1), fixed = ~ GA_Days + Age + Race + pregnant + 
            offset(log(Total.Read.Counts)), data = Romero$SampleData,
          random = ~ 1 | subject, min.p = 0.2, method = "zig", 
          zi_fixed = ~1, zi_random = NULL)
