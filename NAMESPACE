@@ -4,17 +4,15 @@ export(glmm.nb)
 export(glmm.zinb)
 export(lme.zig)
 export(mms)
-
+export(mgam)
+export(mglmmTMB)
 
 export(fixed)
-export(fixed.nb)
-export(fixed.lme)
-export(fixed.zi)
 export(fixed.mms)
+export(fixed.mgam)
+export(fixed.mglmmTMB)
 
-export(get.fixed)
 export(plot.fixed)
-export(covariates)
 export(heat.p)
 
 export(sim)
