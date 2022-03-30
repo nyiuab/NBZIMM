@@ -83,10 +83,9 @@ glmm.nb <- function (fixed, random, data, correlation,
     }
     
     attributes(fit$logLik) <- NULL
+    fit$logLik <- as.numeric(NA)
     fit$call <- Call
     fit$iter <- i
-    fit$logLik <- as.numeric(NA)
-    
     fit$theta <- fam$theta
     oldClass(fit) <- c("nbmm", oldClass(fit))
     

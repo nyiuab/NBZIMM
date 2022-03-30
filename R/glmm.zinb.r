@@ -109,14 +109,13 @@ glmm.zinb <- function (fixed, random, data, correlation,
     }
   
     attributes(fit$logLik) <- NULL
+    fit$logLik <- as.numeric(NA)
     fit$call <- Call
     fit$iter <- i
-    fit$logLik <- as.numeric(NA)
-    
     fit$theta <- fam$theta
     fit$zero.indicator <- zp
     fit$zero.prob <- exp(zero.eta)/(1 + exp(zero.eta))
-    fit$fit.zero <- fit.zinb 
+    fit$zi.fit <- fit.zinb 
 
     oldClass(fit) <- c("zinbmm", oldClass(fit))
     
@@ -129,7 +128,6 @@ glmm.zinb <- function (fixed, random, data, correlation,
   
     fit
 }
-
 
 #*********************************************************************************************
 

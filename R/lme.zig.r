@@ -127,13 +127,12 @@ lme.zig <- function (fixed, random, data, correlation,
     }
   
     attributes(fit$logLik) <- NULL
+    fit$logLik <- as.numeric(NA)
     fit$call <- Call
     fit$iter <- i
-    fit$logLik <- as.numeric(NA)
-    
     fit$zero.indicator <- zp
     fit$zero.prob <- exp(zero.eta)/(1 + exp(zero.eta))
-    fit$fit.zero <- fit.zig 
+    fit$zi.fit <- fit.zig 
 #    fit$xz <- xz0
 #    fit$offsetz <- offsetz
     

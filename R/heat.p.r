@@ -14,7 +14,7 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
   df = as.data.frame(df)
   if (!"responses" %in% names(df) | !"variables" %in% names(df) | 
       !"pvalue" %in% names(df) | !"Estimate" %in% names(df) ) 
-    stop("df should include 'responses', 'variables', and 'pvalue'")
+    stop("df should include 'responses', 'variables', 'Estimate', and 'pvalue'")
   if (length(colors) != length(p.breaks) + 1) 
     stop("number of colors does not equal p value intervals")
   
@@ -45,7 +45,6 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
     x.size <- NULL
   if (missing(y.size)) 
     y.size <- NULL
-  
   p = ggplot(df, aes(variables, responses))
   p = p + xlab("") + ylab("")
   p = p + geom_tile(aes(fill = p_value))
@@ -82,8 +81,8 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
                grep = TRUE)
   }
 
-  #grid.newpage()
+  grid.newpage()
   grid.draw(g)
-  #return(g)
+  return(g)
 }
 
