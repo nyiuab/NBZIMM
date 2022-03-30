@@ -54,12 +54,14 @@ glmm.nb(fixed, random, data, correlation,
 }
 \references{
   Pinheiro, J.C., and Bates, D.M. (2000) "Mixed-Effects Models in S and S-PLUS", Springer. 
-
+  
   Venables, W. N. and Ripley, B. D. (2002) "Modern Applied Statistics with S". Fourth edition. Springer. 
 
   Xinyan Zhang, Himel Mallick, Xiangqin Cui, Andrew K. Benson, and Nengjun Yi (2017) Negative Binomial Mixed Models for Analyzing Microbiome Count Data. BMC Bioinformatics 18(1):4.
   
-  Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology.
+  Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology 9:1683. 
+  
+  Xinyan Zhang and Nengjun Yi 2020 NBZIMM: Negative Binomial and Zero-Inflated Mixed Models, with Applications to Microbiome Data Analysis. BMC Bioinformatics 21(1):488. 
 }
 
 \author{
@@ -74,6 +76,7 @@ glmm.nb(fixed, random, data, correlation,
 
 library(NBZIMM)
 
+# load data
 data(Romero)
 names(Romero)
 
@@ -88,15 +91,26 @@ Race = sam$Race
 preg = sam$pregnant; table(preg)
 subject = sam[, "Subect_ID"]; table(subject)
 
+# analyze one response
 y = otu[, 1]
 
 f = glmm.nb(y ~ Days + Age + Race + preg + offset(log(N)), random = ~ 1 | subject)
 summary(f)
-fixed(f)
 
 
 library(lme4)  # compared with lme4
 f0 = glmer.nb(y ~ Days + Age + Race + preg + offset(log(N)) + (1 | subject))   
+summary(f0)
+
+library(mgcv)  # compared with mgcv
+f0 = gam(y ~ Days + Age + Race + preg + offset(log(N)) + s(subject, bs="re"), 
+         family=nb(), method="REML") 
+summary(f0)
+
+library(glmmTMB) # compared with glmmTMB
+data = data.frame(y=y, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
+f0 = glmmTMB(y ~ Days + Age + Race + preg + offset(log(N)) + (1 | subject),  
+             family = nbinom2)
 summary(f0)
 
 }

@@ -8,26 +8,20 @@
 }
 
 \description{
-This function is to extract the estimates, standard deviations and p-values of fixed effects  
-from the output of \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, \code{\link{lme.zig}}, or \code{\link{mms}}.
+This function is to extract the estimates, standard deviations and p-values of fixed effects.
 }
 
 \usage{
 fixed(object) 
-
-fixed.nb(object)
-
-fixed.lme(object)
-
-fixed.zi(object)
-
 fixed.mms(object)
+fixed.mgam(object)
+fixed.mglmmTMB(object)
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{ 
-  an object from \code{\link{glmm.nb}}, \code{\link{lme}}, \code{\link{glmm.zinb}}, \code{\link{lme.zig}}, or \code{\link{mms}}.
+  an object from \code{\link{mms}}, \code{\link{mgam}, or \code{\link{mglmmTMB}}}.
   }
 }
 
@@ -36,16 +30,7 @@ fixed.mms(object)
 }
 
 \value{
-This function returns the following values for the distribution part (\code{dist}) and/or the zero-inflation part (\code{zero}): 
-
-\item{Estimate}{intercept and coefficient estimates;} 
-\item{Std. Error}{standard errors of estimates;}
-\item{pvalue}{p-values for testing coefficients;} 
-
-For an object from \code{\link{mms}}, also return:
-
-\item{padj}{adjusted p-values using FDR method;} 
-
+  These functions return the estimates, standard deviations and p-values of fixed effects.
 }
 
 \author{
@@ -57,6 +42,6 @@ For an object from \code{\link{mms}}, also return:
 }
 
 \examples{
-see examples in \code{\link{glmm.nb}}, \code{\link{glmm.zinb}}, \code{\link{lme.zig}}, and \code{\link{mms}} 
+see examples in \code{\link{mms}, \code{\link{mgam}, or \code{\link{mglmmTMB}}}} 
 }
 

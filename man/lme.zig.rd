@@ -62,7 +62,7 @@ lme.zig(fixed, random, data, correlation,
   The object contains additional components for the zero-inflation part: 
 \item{zero.prob}{the zero-state probabilities;}
 \item{zero.indicator}{the conditional expectations of the zero indicators;}
-\item{fit.zero}{the fitted logistic (mixed) model for the zero-inflation part;}
+\item{zi.fit}{the fitted logistic (mixed) model for the zero-inflation part;}
 }
 
 \references{
@@ -72,7 +72,13 @@ lme.zig(fixed, random, data, correlation,
 
   Xinyan Zhang, Himel Mallick, Xiangqin Cui, Andrew K. Benson, and Nengjun Yi (2017) Negative Binomial Mixed Models for Analyzing Microbiome Count Data. BMC Bioinformatics 18(1):4. 
   
-  Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology.
+  Xinyan Zhang, Yu-Fang Pei, Lei Zhang, Boyi Guo, Amanda Pendegraft, Wenzhuo Zhuang and Nengjun Yi (2018) Negative Binomial Mixed Models for Analyzing Longitudinal Microbiome Data. Frontiers in Microbiology 9:1683.
+  
+  Xinyan Zhang and Nengjun Yi 2020 Fast Zero-Inflated Negative Binomial Mixed Models for Analyzing Longitudinal Metagenomics Data. Bioinformatics. doi: 10.1093/bioinformatics/btz973. 
+  
+  Xinyan Zhang, Boyi Guo, and Nengjun Yi 2020 Zero-Inflated Gaussian Mixed Models for Analyzing Longitudinal Microbiome Data. PLoS One 15(11):e0242073. 
+  
+  Xinyan Zhang and Nengjun Yi 2020 NBZIMM: Negative Binomial and Zero-Inflated Mixed Models, with Applications to Microbiome Data Analysis. BMC Bioinformatics 21(1):488.
 }
 
 \author{
@@ -87,19 +93,13 @@ lme.zig(fixed, random, data, correlation,
 
 library(NBZIMM)
 
+# load data
 data(Romero)
 names(Romero)
 
 otu = Romero$OTU; dim(otu)
 sam = Romero$SampleData; dim(sam)
 colnames(sam)
-
-N = sam[, "Total.Read.Counts"]  # total reads
-preg = sam$pregnant; table(preg)
-subject = sam[, "Subect_ID"]; table(subject)
-
-non = nonzero(y = otu, total = N, plot = F)
-nonzero.p = non[[1]]
 
 N = sam[, "Total.Read.Counts"]        
 Days = sam$GA_Days; Days = scale(Days)
@@ -108,14 +108,15 @@ Race = sam$Race
 preg = sam$pregnant; table(preg)
 subject = sam[, "Subect_ID"]; table(subject)
 
+# analyze one response
 y = otu[, 1]
 
+# zero-inflated gaussian model
 y0 = log(y+1)
 data = data.frame(y0=y0, Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
 f = lme.zig(fixed = y0 ~ Days + Age + Race + preg + offset(log(N)), 
             random = ~ 1 | subject, data = data) 
 summary(f)
-fixed(f)
-summary(f$fit.zero)
+summary(f$zi.fit)
 
 }
