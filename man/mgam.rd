@@ -98,6 +98,6 @@ plot.fixed(res=preg.coefs[,c("Estimate","Std.Error","padj")],
 
 g = heat.p(df=para, p.breaks = c(0.001, 0.01, 0.05), 
        colors = c("black", "darkgrey", "grey", "lightgrey"),
-       zigzag=c(T,F), abbrv=c(T,F), margin=c(2.5,0.5), y.size=8,
+       zigzag=c(T,F), abbrv=c(T,F), margin=c(1,6), y.size=8,
        legend=T)
 }
