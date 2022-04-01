@@ -4,7 +4,7 @@ heat.p <- function (df, p.breaks = c(0.001, 0.01, 0.05),
                     title = NULL, subtitle = NULL,
                     filter = c(FALSE, FALSE), x.size, y.size, symbol.size,
                     zigzag = c(FALSE, FALSE), abbrv = c(FALSE, FALSE), 
-                    margin = c(1, 1), legend = TRUE) 
+                    margin = c(1, 2), legend = TRUE) 
 {
   if (!requireNamespace("ggplot2")) install.packages("ggplot2")
   if (!requireNamespace("grid")) install.packages("grid")
