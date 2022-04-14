@@ -1,0 +1,112 @@
+---
+title: "Fitting Multiple taxa with Generalized additive models (gam)"
+author: "Nengjun Yi, Xinyan Zhang"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{mglmmtmb}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+params:
+  EVAL: !r identical(Sys.getenv("NOT_CRAN"), "true")
+---
+
+```{r, SETTINGS-knitr, include=FALSE}
+stopifnot(require(knitr))
+opts_chunk$set(
+  comment=NA, 
+  message = FALSE, 
+  warning = FALSE, 
+  eval = params$EVAL,
+  dev = "png",
+  dpi = 500,
+  fig.asp = 0.618,
+  fig.width = 14,
+  out.width = "100%",
+  fig.align = "center"
+)
+```
+
+```{r, pkgs, include=FALSE}
+library("NBZIMM")
+```
+
+
+## Introduction
+
+This vignette focuses on demonstrations of fitting  Generalized Linear Mixed Models for multiple longitudinal microbiome taxa with **NBZIMM**. 
+
+The **NBZIMM**  provides a `mglmmTMB` functions for setting up and fitting  Generalized Linear Mixed Models by working with the function `glmmTMB` from R package **glmmTMB**. 
+
+In this vignette we'll use the `mglmmTMB` function in the 
+**NBZIMM** package to demonstrate the analysis of a public available dataset from Romero et al (2014).
+
+## Demonstration with Example
+
+This example used a published dataset from [Romero et al.(2014)](https://microbiomejournal.biomedcentral.com/articles/10.1186/2049-2618-2-4). It was a case-control longitudinal study collected 22 pregnant women who delivered at term and 32 non-pregnant women, each measured at multiple time points. The data consist of two data components: OTU and SampleData. OTU contains microbiome count data for 900 samples with 143 taxa; SampleData contains data of sample variables for all the samples with 9 variables, including subject ID, pregnant status, total sequencing read, age, race, etc.
+
+Here we import the dataset from the package **NBZIMM** and check the clinical variables first.
+
+
+```{r, romero}
+data(Romero) # see help("Romero")
+names(Romero)
+```
+
+Get the necessary variables to fit the models
+```{r, variables}
+otu = Romero$OTU; dim(otu)
+sam = Romero$SampleData; dim(sam)
+colnames(sam)
+
+N = sam[, "Total.Read.Counts"]        
+Days = sam$GA_Days
+Age = sam$Age
+Race = sam$Race
+preg = sam$pregnant; table(preg)
+subject = sam[, "Subect_ID"]; table(subject)
+
+```
+
+### analyze all taxa using generalized additive models with a given nonzero proportion
+
+```{r, mglmmtmb}
+data = data.frame(Days=Days, Age=Age, Race=Race, preg=preg, N=N, subject=subject)
+
+# negative binomial mixed model
+f1 = mglmmTMB(y = otu, formula = ~ Days + Age + Race + preg + offset(log(N))+ (1 | subject), 
+        data = data, family = nbinom2, min.p = 0.2)
+
+# zero-inflated negative binomial mixed model
+f2 = mglmmTMB(y = otu, formula = ~ Days + Age + Race + preg + offset(log(N))+ (1 | subject), 
+              data = data, family = nbinom2, zi = ~1,
+              min.p = 0.2)
+
+# display the results
+f = f1
+out = fixed(f)
+out = out$cond
+out = out[out[,2]!="(Intercept)", ]
+
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 12, 4, 4))
+plot.fixed(res=out[,c("Estimate","Std.Error","padj")], 
+           threshold=0.001, gap=500, col.pts=c("black", "grey"),
+           cex.axis=0.6, cex.var=0.7)
+
+preg.coefs = out[out$variables=="preg",]
+par(mfrow = c(1, 1), cex.axis = 1, mar = c(2, 10, 4, 4))
+plot.fixed(res=preg.coefs[,c("Estimate","Std.Error","padj")], 
+           threshold=0.05, gap=300, main="Covariate: pregnant",
+           cex.axis=0.6, cex.var=0.7)
+
+g = heat.p(df=out, p.breaks = c(0.001, 0.01, 0.05), 
+           colors = c("black", "darkgrey", "grey", "lightgrey"),
+           zigzag=c(T,F), abbrv=c(T,F), margin=c(1,6), y.size=8,
+           legend=T)
+
+```
+
+
+
