@@ -22,9 +22,12 @@ glmm.nb <- function (fixed, random, data, correlation,
     else c(all.vars(fixed), all.vars(random))
     Terms <- if (missing(data)) terms(fixed)
     else terms(fixed, data = data)
-    off <- attr(Terms, "offset")
-    if (length(off <- attr(Terms, "offset")))
-        allvars <- c(allvars, as.character(attr(Terms, "variables"))[off + 1])
+    offt <- attr(Terms, "offset")
+    have_offset <- length(offt) >= 1L
+    if (have_offset) {
+      offvars <- as.character(attr(Terms, "variables"))[offt + 1L]
+      allvars <- c(allvars, offvars)
+    }
     if (!missing(correlation) && !is.null(attr(correlation, "formula")))
         allvars <- c(allvars, all.vars(attr(correlation, "formula")))
     Call$fixed <- eval(fixed)
@@ -36,6 +39,12 @@ glmm.nb <- function (fixed, random, data, correlation,
     mf <- eval.parent(m)
     off <- model.offset(mf)
     if (is.null(off)) off <- 0
+    fixed2 <- if (have_offset) {
+      tf <- drop.terms(Terms, offt, keep.response = TRUE)
+      reformulate(attr(tf, "term.labels"), response = fixed[[2L]], 
+                  intercept = attr(tf, "intercept"), env = environment(fixed))
+    }
+    else fixed
     wts <- model.weights(mf)
     if (is.null(wts)) wts <- rep(1, nrow(mf))
     mf$wts <- wts
@@ -49,8 +58,8 @@ glmm.nb <- function (fixed, random, data, correlation,
     nm <- names(mcall)[-1L]
     keep <- is.element(nm, c("fixed", "random", "data", "subset", "na.action", "control"))
     for (i in nm[!keep]) mcall[[i]] <- NULL
-    fixed[[2L]] <- quote(zz)
-    mcall[["fixed"]] <- fixed
+    fixed2[[2L]] <- quote(zz)
+    mcall[["fixed"]] <- fixed2
     mcall[[1L]] <- quote(nlme::lme)
     mcall$random <- random
     mcall$method <- "ML"
@@ -87,6 +96,12 @@ glmm.nb <- function (fixed, random, data, correlation,
     fit$call <- Call
     fit$iter <- i
     fit$theta <- fam$theta
+    if (have_offset) {
+      fit$fitted <- fit$fitted + off
+      fit$have_offset <- TRUE
+      fit$fixed2 <- fixed2
+      fit$offvars <- offvars
+    }
     oldClass(fit) <- c("nbmm", oldClass(fit))
     
     stop.time <- Sys.time()
