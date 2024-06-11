@@ -15,12 +15,6 @@ lme.zig <- function (fixed, random, data, correlation,
     if (missing(data)) stop("'data' should be specified")
     family <- gaussian()
     m <- mcall <- Call <- match.call()
-#    data0 <- environment(fixed)
-#    tf <- two.fm(formula = fixed, data = data0) 
-#    fixed <- tf$fmc
-#    xz <- xz0 <- tf$Z
-#    offsetz <- tf$offsetz
-#    if (colnames(xz)[1]=="(Intercept)") xz <- xz[, -1, drop = FALSE]
     nm <- names(m)[-1L]
     keep <- is.element(nm, c("weights", "data", "subset", "na.action"))
     for (i in nm[!keep]) m[[i]] <- NULL
@@ -30,9 +24,12 @@ lme.zig <- function (fixed, random, data, correlation,
     else c(all.vars(fixed), all.vars(random))
     Terms <- if (missing(data)) terms(fixed)
     else terms(fixed, data = data)
-    off <- attr(Terms, "offset")
-    if (length(off <- attr(Terms, "offset")))
-        allvars <- c(allvars, as.character(attr(Terms, "variables"))[off + 1])
+    offt <- attr(Terms, "offset")
+    have_offset <- length(offt) >= 1L
+    if (have_offset) {
+      offvars <- as.character(attr(Terms, "variables"))[offt + 1L]
+      allvars <- c(allvars, offvars)
+    }
     if (!missing(correlation) && !is.null(attr(correlation, "formula")))
         allvars <- c(allvars, all.vars(attr(correlation, "formula")))
     Call$fixed <- eval(fixed)
@@ -44,6 +41,12 @@ lme.zig <- function (fixed, random, data, correlation,
     mf <- eval.parent(m)
     off <- model.offset(mf)
     if (is.null(off)) off <- 0
+    fixed2 <- if (have_offset) {
+      tf <- drop.terms(Terms, offt, keep.response = TRUE)
+      reformulate(attr(tf, "term.labels"), response = fixed[[2L]], 
+                  intercept = attr(tf, "intercept"), env = environment(fixed))
+    }
+    else fixed
     wts <- model.weights(mf)
     if (is.null(wts)) wts <- rep(1, nrow(mf))
     mf$wts <- wts
@@ -57,8 +60,8 @@ lme.zig <- function (fixed, random, data, correlation,
     nm <- names(mcall)[-1L]
     keep <- is.element(nm, c("fixed", "random", "data", "subset", "na.action", "control"))
     for (i in nm[!keep]) mcall[[i]] <- NULL
-    fixed[[2L]] <- quote(zz)
-    mcall[["fixed"]] <- fixed
+    fixed2[[2L]] <- quote(zz)
+    mcall[["fixed"]] <- fixed2
     mcall[[1L]] <- quote(nlme::lme)
     mcall$random <- random
     mcall$method <- "ML"
@@ -101,21 +104,6 @@ lme.zig <- function (fixed, random, data, correlation,
         if (!is.null(fit.zig$offset)) zero.eta <- zero.eta + fit.zig$offset
       }
       
-#      if (!zi.random){ 
-#        if (ncol(xz) > 0)
-#          fit.zig <- suppressWarnings(glm(zp ~ ., offset=offsetz, family=binomial, data=data.frame(xz)))
-#        else fit.zig <- suppressWarnings(glm(zp ~ 1, offset=offsetz, family=binomial))
-#        zero.eta <- fit.zig$linear.predictors
-#      }
-#      else{
-#        if (ncol(xz) > 0){
-#          z <- xz
-#          fit.zig <- suppressWarnings(glmmPQL(fixed=zp ~ z + offset(offsetz), random=random, family=binomial, verbose = FALSE)) 
-#        }
-#        else fit.zig <- suppressWarnings(glmmPQL(fixed=zp ~ 1 + offset(offsetz), random=random, family=binomial, verbose = FALSE))
-#        zero.eta <- fitted(fit.zig) + offsetz
-#      }
-      
       sigma <- sigma(fit)
       den <- dnorm(y, mu, sigma)
       zp <- 1/(1 + exp(-zero.eta) * den )
@@ -130,12 +118,16 @@ lme.zig <- function (fixed, random, data, correlation,
     fit$logLik <- as.numeric(NA)
     fit$call <- Call
     fit$iter <- i
+    if (have_offset) {
+      fit$fitted <- fit$fitted + off
+      fit$have_offset <- TRUE
+      fit$fixed2 <- fixed2
+      fit$offvars <- offvars
+    }
     fit$zero.indicator <- zp
     fit$zero.prob <- exp(zero.eta)/(1 + exp(zero.eta))
     fit$zi.fit <- fit.zig 
-#    fit$xz <- xz0
-#    fit$offsetz <- offsetz
-    
+   
     oldClass(fit) <- c("zigmm", oldClass(fit))
     
     stop.time <- Sys.time()
